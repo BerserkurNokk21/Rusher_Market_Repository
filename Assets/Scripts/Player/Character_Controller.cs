@@ -18,6 +18,8 @@ public class Character_Controller : MonoBehaviour
 
     Vector2 moveDir;
 
+    Enemy enemy;
+
     void Start()
     {
         _playerInputs = new PlayerInputs();
@@ -60,6 +62,10 @@ public class Character_Controller : MonoBehaviour
             nearbyItem = item;
             isNearItem = true;
         }
+
+        if(collision.CompareTag("Enemy")&& _playerInputs.PlayerActions.Attack.triggered){
+            enemy.stunned = true;
+        }
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
@@ -68,6 +74,10 @@ public class Character_Controller : MonoBehaviour
         {
             nearbyItem = null;
             isNearItem = false;
+        }
+        if (collision.CompareTag("Enemy") )
+        {
+            enemy.stunned = false;
         }
     }
 }
