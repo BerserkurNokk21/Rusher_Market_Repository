@@ -60,6 +60,17 @@ public class Character_Controller : MonoBehaviour
             nearbyItem = item;
             isNearItem = true;
         }
+<<<<<<< Updated upstream
+=======
+
+        if(collision.CompareTag("Enemy")&& _playerInputs.PlayerActions.Attack.triggered){
+            enemy.stunned = true;
+        }
+        else
+        {
+            Debug.Log("No enemy found");
+        }
+>>>>>>> Stashed changes
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
@@ -69,5 +80,16 @@ public class Character_Controller : MonoBehaviour
             nearbyItem = null;
             isNearItem = false;
         }
+<<<<<<< Updated upstream
+=======
+        if (collision.CompareTag("Enemy") )
+        {
+            enemy.stunned = false;
+        }
+        else
+        {
+            Debug.Log("No enemy found");
+        }
+>>>>>>> Stashed changes
     }
 }

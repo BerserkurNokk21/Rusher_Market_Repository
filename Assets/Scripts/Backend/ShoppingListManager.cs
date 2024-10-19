@@ -13,11 +13,8 @@ public class ShoppingListManager : MonoBehaviour
     // Método para agregar un ítem a la lista
     public void AddItemToShoppingList(string item)
     {
-        if (!shoppingList.Contains(item)) // Asegurarse de no agregar el mismo ítem dos veces
-        {
-            shoppingList.Add(item);
-            UpdateShoppingListUI();
-        }
+        shoppingList.Add(item);
+        UpdateShoppingListUI();
     }
 
     // Método para eliminar un ítem de la lista (opcional, si lo necesitas en el futuro)
