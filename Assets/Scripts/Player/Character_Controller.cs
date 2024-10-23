@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Character_Controller : MonoBehaviour
+public class Character_Controller : NetworkBehaviour
 {
     [SerializeField] PlayerInputs _playerInputs;
     public float moveSpeed;
@@ -37,6 +38,10 @@ public class Character_Controller : MonoBehaviour
         if (heldItem != null)
         {
             heldItem.transform.position = transform.position + itemCarryOffset;
+        }
+
+        if(!IsOwner){
+            return;
         }
     }
 
