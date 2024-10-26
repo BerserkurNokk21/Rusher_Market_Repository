@@ -10,10 +10,10 @@ public class Character_Controller : NetworkBehaviour
     public float moveSpeed;
     public Rigidbody2D rb;
 
-    [SerializeField] private Item_List nearbyItem;
+    [SerializeField] private Item_Product nearbyItem;
     [SerializeField] private bool isNearItem = false;
 
-    [SerializeField] public Item_List heldItem; // El ítem que el jugador está sosteniendo
+    [SerializeField] public Item_Product heldItem; // El ítem que el jugador está sosteniendo
 
     public Vector3 itemCarryOffset = new Vector3(0.5f, 0.5f, 0); // Offset del ítem respecto al jugador
 
@@ -56,12 +56,11 @@ public class Character_Controller : NetworkBehaviour
         if (isNearItem && nearbyItem != null && heldItem == null)
         {
             heldItem = nearbyItem;
-            Debug.Log("Picked up item: " + heldItem.itemName);
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Item_List item = collision.GetComponent<Item_List>();
+        Item_Product item = collision.GetComponent<Item_Product>();
         if (item != null)
         {
             nearbyItem = item;
@@ -74,7 +73,7 @@ public class Character_Controller : NetworkBehaviour
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
-        Item_List item = collision.GetComponent<Item_List>();
+        Item_Product item = collision.GetComponent<Item_Product>();
         if (item != null && item == nearbyItem)
         {
             nearbyItem = null;

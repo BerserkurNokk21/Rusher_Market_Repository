@@ -7,22 +7,32 @@ public class ShoppingListManager : MonoBehaviour
     // Referencia al componente TextMeshProUGUI donde se mostrará la lista
     public TextMeshProUGUI shoppingListText;
 
-    // Lista dinámica de la compra
-    private List<string> shoppingList = new List<string>();
+    // Lista dinámica de la compra (almacena pares ID-Nombre)
+    private List<string> shoppingListIds = new List<string>();
+    private List<string> shoppingListNames = new List<string>();
 
     // Método para agregar un ítem a la lista
-    public void AddItemToShoppingList(string item)
+    public void AddItemToShoppingList(string id, string name)
     {
-        shoppingList.Add(item);
+        shoppingListIds.Add(id);
+        shoppingListNames.Add(name);
         UpdateShoppingListUI();
     }
 
-    // Método para eliminar un ítem de la lista (opcional, si lo necesitas en el futuro)
-    public void RemoveItemFromShoppingList(string item)
+    // Método para verificar si un ítem ya está en la lista de compras por su ID
+    public bool ShoppingListContains(string id)
     {
-        if (shoppingList.Contains(item))
+        return shoppingListIds.Contains(id);
+    }
+
+    // Método para eliminar un ítem de la lista de compras
+    public void RemoveItemFromShoppingList(string id)
+    {
+        int index = shoppingListIds.IndexOf(id);
+        if (index != -1)
         {
-            shoppingList.Remove(item);
+            shoppingListIds.RemoveAt(index);
+            shoppingListNames.RemoveAt(index);
             UpdateShoppingListUI();
         }
     }
@@ -31,9 +41,9 @@ public class ShoppingListManager : MonoBehaviour
     private void UpdateShoppingListUI()
     {
         shoppingListText.text = "";  // Limpia el texto previo
-        foreach (string item in shoppingList)
+        for (int i = 0; i < shoppingListNames.Count; i++)
         {
-            shoppingListText.text += "- " + item + "\n";  // Muestra cada ítem
+            shoppingListText.text += "- " + shoppingListNames[i] + "\n";  // Muestra cada ítem
         }
     }
 }
