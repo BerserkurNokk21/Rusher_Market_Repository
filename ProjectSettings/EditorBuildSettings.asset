@@ -8,7 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Tests_Scenes/ListManager_Tests.unity
     guid: 83a733a4f5c996348aef540122550be3
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Tests_Scenes/Netcode_Test.unity
     guid: a0c783a84186cac4db7108d157a216cf
   m_configObjects: {}
