@@ -7,27 +7,27 @@ using UnityEngine.InputSystem;
 
 public class Character_Controller : NetworkBehaviour
 {
-    [SerializeField] PlayerInputs _playerInputs;
-    public float moveSpeed;
+    [Header("Player References")]
+    [SerializeField] private Collider2D attackCol;
     public Rigidbody2D rb;
+    [SerializeField] private Transform attackPos;
+    [SerializeField] private Item_Product nearbyItem;
+    [SerializeField] public Item_Product heldItem; // El ítem que el jugador está sosteniendo
+    [SerializeField] PlayerInputs _playerInputs;
+    Enemy enemy;
 
+    [Header("Player Settings")]
     [SerializeField] private bool stunned;
     [SerializeField] private float stunTime;
-    [SerializeField] private Collider2D attackCol;
-    [SerializeField] private Transform attackPos;
     [SerializeField] private float attackRadius;
-
-    [SerializeField] private Item_Product nearbyItem;
     [SerializeField] private bool isNearItem = false;
-
-    [SerializeField] public Item_Product heldItem; // El ítem que el jugador está sosteniendo
-
+    public float moveSpeed;
     public Vector3 itemCarryOffset = new Vector3(0.5f, 0.5f, 0); // Offset del ítem respecto al jugador
+    public Vector2 moveDir;
 
-    Vector2 moveDir;
 
 
-    Enemy enemy;
+
 
     void Start()
     {
@@ -42,12 +42,12 @@ public class Character_Controller : NetworkBehaviour
 
     void Update()
     {
-        
-        if(!IsOwner){
+
+        if (!IsOwner){
             return;
         }
-        Hit();
         Move();
+        Hit();
         if (heldItem != null)
         {
             heldItem.transform.position = transform.position + itemCarryOffset;
@@ -61,6 +61,7 @@ public class Character_Controller : NetworkBehaviour
 
     void Move()
     {
+        Debug.Log("Move");
         moveDir = _playerInputs.PlayerActions.Mover.ReadValue<Vector2>();
         rb.velocity = new Vector2(moveDir.x * moveSpeed, moveDir.y * moveSpeed);
     }

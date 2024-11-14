@@ -805,9 +805,9 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 0, y: 0.5773587}
-      - {x: -0.5, y: -0.28866667}
-      - {x: 0.5, y: -0.28866667}
+    - - {x: -0.04905796, y: 1.3272431}
+      - {x: -0.8504133, y: -0.37276572}
+      - {x: 1.0676694, y: -0.35874933}
   m_UseDelaunayMesh: 0
 --- !u!114 &1081574984
 MonoBehaviour:
@@ -822,6 +822,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
+  item_List: {fileID: 0}
+--- !u!61 &1119621246 stripped
+BoxCollider2D:
+  m_CorrespondingSourceObject: {fileID: 5052143220046260290, guid: b27d8471b6eda504295c8cc05e4b9c65, type: 3}
+  m_PrefabInstance: {fileID: 3108764491532015220}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1247880794
 GameObject:
   m_ObjectHideFlags: 0
@@ -1244,6 +1250,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2241720902291137023, guid: b27d8471b6eda504295c8cc05e4b9c65, type: 3}
+      propertyPath: attackCol
+      value: 
+      objectReference: {fileID: 1119621246}
     - target: {fileID: 3261863673461498925, guid: b27d8471b6eda504295c8cc05e4b9c65, type: 3}
       propertyPath: m_Name
       value: Player
