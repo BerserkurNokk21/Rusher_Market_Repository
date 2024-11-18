@@ -65,15 +65,20 @@ public class Item_List : MonoBehaviour
     {
         // Asegurarse de que no se agreguen más de los productos permitidos (listProductsLimit)
         int itemsAdded = 0;
+
         foreach (Product product in products)
         {
+            // Obtener un producto aleatorio de la lista de productos
+            Product randomProduct = products[Random.Range(0, products.Count)];
+
             if (itemsAdded >= listProductsLimit)
                 break;
 
-            if (!playerShoppingList.Contains(product))
+            // Añadir el producto aleatorio a la lista de compras si no está ya en ella
+            if (!playerShoppingList.Contains(randomProduct))
             {
-                playerShoppingList.Add(product);
-                shoppingListManager.AddItemToShoppingList(product.id, product.name);
+                playerShoppingList.Add(randomProduct);
+                shoppingListManager.AddItemToShoppingList(randomProduct.id, randomProduct.name);
                 itemsAdded++;
             }
         }

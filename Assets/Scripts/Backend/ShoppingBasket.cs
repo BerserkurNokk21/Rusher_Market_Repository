@@ -30,7 +30,7 @@ public class ShoppingBasket : MonoBehaviour
             Debug.Log(heldItem.selectedProduct);
             if (heldItem.selectedProduct != null)
             {
-                foreach (Product product in item_List.products)
+                foreach (Product product in item_List.playerShoppingList)
                 {
                     if (product.id == heldItem.id)
                     {
@@ -39,7 +39,7 @@ public class ShoppingBasket : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogWarning("Producto no encontrado: " + heldItem.id);
+                        Debug.LogWarning("Producto no instanciado en la lista del jugador: " + heldItem.id);
                     }
                 }
             }
