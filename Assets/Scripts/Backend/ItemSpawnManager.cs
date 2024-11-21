@@ -4,42 +4,42 @@ using UnityEngine;
 
 public class ItemSpawnManager : MonoBehaviour
 {
-    // Lista de prefabs de ítems a hacer spawn
-    [SerializeField] private List<GameObject> itemPrefabs;
+    [System.Serializable]
+    public class SpawnPointConfig
+    {
+        public Transform spawnPoint; // Punto de spawn
+        public GameObject itemPrefab; // Ítem que aparecerá en este punto
+    }
 
-    // Lista de puntos de respawn (se asignan en el editor)
-    [SerializeField] private List<Transform> spawnPoints;
-
-    // Tiempo entre spawns
-    public float spawnInterval = 5.0f;
-
-    // Tiempo antes del primer spawn
-    public float initialSpawnDelay = 2.0f;
+    [SerializeField] private List<SpawnPointConfig> spawnPointConfigs; // Configuración de puntos de spawn
+    public float spawnInterval = 5.0f; // Intervalo entre spawns
+    public float initialSpawnDelay = 2.0f; // Retraso inicial antes del primer spawn
 
     void Start()
     {
-        // Inicia el proceso de respawn repetido
         StartCoroutine(SpawnItems());
     }
 
-    // Corrutina que se encarga de hacer spawn de los ítems
+    // Corrutina para instanciar los ítems en sus puntos asignados
     IEnumerator SpawnItems()
     {
-        // Espera el tiempo inicial antes de empezar a hacer spawns
         yield return new WaitForSeconds(initialSpawnDelay);
 
-        while (true) // Hacer respawn indefinidamente (puedes añadir una condición si lo necesitas)
+        while (true)
         {
-            // Selecciona un prefab de ítem aleatorio
-            GameObject itemToSpawn = itemPrefabs[Random.Range(0, itemPrefabs.Count)];
+            foreach (SpawnPointConfig config in spawnPointConfigs)
+            {
+                if (config.itemPrefab != null && config.spawnPoint != null)
+                {
+                    // Instanciar el ítem asignado en el punto correspondiente
+                    Instantiate(config.itemPrefab, config.spawnPoint.position, config.spawnPoint.rotation);
+                }
+                else
+                {
+                    Debug.LogWarning("Un punto de spawn o un prefab no están asignados en la configuración.");
+                }
+            }
 
-            // Selecciona un punto de spawn aleatorio
-            Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];
-
-            // Instancia el ítem en el punto de spawn
-            Instantiate(itemToSpawn, spawnPoint.position, spawnPoint.rotation);
-
-            // Espera antes de hacer el próximo spawn
             yield return new WaitForSeconds(spawnInterval);
         }
     }

@@ -1009,6 +1009,25 @@ BoxCollider2D:
   m_CorrespondingSourceObject: {fileID: 5052143220046260290, guid: b27d8471b6eda504295c8cc05e4b9c65, type: 3}
   m_PrefabInstance: {fileID: 3108764491532015220}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1142573391 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3261863673461498925, guid: b27d8471b6eda504295c8cc05e4b9c65, type: 3}
+  m_PrefabInstance: {fileID: 3108764491532015220}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1142573398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142573391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60322fa391919d742965db097fee951a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerID: 
+  playerName: 
 --- !u!1 &1247880794
 GameObject:
   m_ObjectHideFlags: 0
@@ -1269,12 +1288,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 562043abfc0f9c743bc85e6c39a97801, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemPrefabs:
-  - {fileID: 2671075906453112002, guid: c73c9f964f3673f418adcdab870c8cce, type: 3}
-  spawnPoints:
-  - {fileID: 402969803}
-  - {fileID: 741304680}
-  - {fileID: 177803049}
+  spawnPointConfigs:
+  - spawnPoint: {fileID: 402969803}
+    itemPrefab: {fileID: 2671075906453112002, guid: c73c9f964f3673f418adcdab870c8cce, type: 3}
   spawnInterval: 5
   initialSpawnDelay: 2
 --- !u!1 &1567051395
@@ -1505,7 +1521,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3261863673461498925, guid: b27d8471b6eda504295c8cc05e4b9c65, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1142573398}
   m_SourcePrefab: {fileID: 100100000, guid: b27d8471b6eda504295c8cc05e4b9c65, type: 3}
 --- !u!1001 &5732541837950877404
 PrefabInstance:

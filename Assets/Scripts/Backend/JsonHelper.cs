@@ -15,4 +15,17 @@ public static class JsonHelper
     {
         public T[] array;
     }
+    [System.Serializable]
+    public class LoginResponse
+    {
+        public string status;
+        public string player_id;
+        public string username;
+    }
+    // Clase para el JSON de la lista de jugadores
+    public static class PlayerData
+    {
+        public static string playerID;
+        public static string playerUsername;
+    }
 }

@@ -2,12 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using static JsonHelper;
 
 public class Item_List : MonoBehaviour
 {
     public List<Product> products = new List<Product>(); // Lista de productos obtenidos de la base de datos
     public List<Product> playerShoppingList = new List<Product>(); // Lista de productos que el jugador ha añadido
-    public string playerId = "14db527a-44ff-4e43-bb3c-08997fb001ee"; // ID del jugador
+    public string playerId; // ID del jugador
     [SerializeField] private int listProductsLimit = 5; // Límite de productos
     private bool productsLoaded = false;
 
@@ -16,6 +17,7 @@ public class Item_List : MonoBehaviour
 
     void Start()
     {
+        playerId = PlayerData.playerID;
         shoppingListManager = FindObjectOfType<ShoppingListManager>();
         StartCoroutine(InitializeShoppingList()); // Inicializar la lista de compras
     }
