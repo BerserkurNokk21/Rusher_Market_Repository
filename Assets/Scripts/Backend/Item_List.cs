@@ -70,17 +70,21 @@ public class Item_List : MonoBehaviour
 
         foreach (Product product in products)
         {
+            Debug.Log(itemsAdded);
             // Obtener un producto aleatorio de la lista de productos
-            Product randomProduct = products[Random.Range(0, products.Count)];
+            //IMPORTANTE VOLVER A DESCOMENTAR CUANDO TENGAMOS MAS ITEMS, SOLAMENTE ESTO ESTA COMENTADO PARA EL PROTOTIPO
+            // Product randomProduct = products[Random.Range(0, products.Count)];
+
+            Debug.Log("Añadiendo producto a la lista de compras: " + product.name);
 
             if (itemsAdded >= listProductsLimit)
                 break;
 
             // Añadir el producto aleatorio a la lista de compras si no está ya en ella
-            if (!playerShoppingList.Contains(randomProduct))
+            if (!playerShoppingList.Contains(product))
             {
-                playerShoppingList.Add(randomProduct);
-                shoppingListManager.AddItemToShoppingList(randomProduct.id, randomProduct.name);
+                playerShoppingList.Add(product);
+                shoppingListManager.AddItemToShoppingList(product.id, product.name);
                 itemsAdded++;
             }
         }

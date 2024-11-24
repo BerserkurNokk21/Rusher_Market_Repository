@@ -1,12 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class ShoppingBasket : MonoBehaviour
 {
     [SerializeField] private Character_Controller player;
     public Item_List item_List;
+    public TextMeshProUGUI itemText;
 
 
     private void Start()
@@ -34,16 +36,26 @@ public class ShoppingBasket : MonoBehaviour
                 {
                     if (product.id == heldItem.id)
                     {
+                        itemText.text = "Product found in the shopping list";
+                        StartCoroutine(ClearItemText());
                         Debug.Log("Producto encontrado en la lista de compras.");
                         DropItemInBasket();
                     }
                     else
                     {
+                        itemText.text = "Product not found in the shopping list";
+                        StartCoroutine(ClearItemText());
                         Debug.LogWarning("Producto no instanciado en la lista del jugador: " + heldItem.id);
                     }
                 }
             }
         }
+    }
+
+    private IEnumerator ClearItemText()
+    {
+        yield return new WaitForSeconds(1f);
+        itemText.text = "";
     }
 
     public void DropItemInBasket()
@@ -53,15 +65,23 @@ public class ShoppingBasket : MonoBehaviour
             Item_Product itemProduct = player.heldItem.GetComponent<Item_Product>();
             if (itemProduct != null)
             {
-                // Llamar al método RemoveFromShoppingList en Item_Product
-                itemProduct.RemoveFromShoppingList(itemProduct.selectedProduct);
-
+                AddPoints(itemProduct.points);
                 // Destruir el objeto en la escena
                 Destroy(player.heldItem.gameObject);
 
                 // Limpiar el ítem que el jugador sostiene
                 player.heldItem = null;
             }
+        }
+    }
+
+    public void AddPoints(float points)
+    {
+        PlayerDataList playerDataList = FindObjectOfType<PlayerDataList>();
+
+        if (playerDataList != null)
+        {
+            playerDataList.AddPoints(points);
         }
     }
 }

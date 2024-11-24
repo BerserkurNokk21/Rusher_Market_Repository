@@ -33,6 +33,10 @@ public class GameTimer : MonoBehaviour
                 isTimerRunning = false;
             }
         }
+        else
+        {
+            LoadGameOverScene();
+        }
     }
 
 
@@ -44,5 +48,9 @@ public class GameTimer : MonoBehaviour
         float seconds = Mathf.FloorToInt(currentTimer % 60);
 
         timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+    void LoadGameOverScene()
+    {
+        // Code to load the game over scene goes here
     }
 }
