@@ -42,3 +42,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Player
+    uniqueID: 359737061
+    locked: 0
+  - name: Shopping_Cart
+    uniqueID: 2798010645
+    locked: 0

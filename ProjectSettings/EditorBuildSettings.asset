@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Tests_Scenes/Netcode_Test.unity
     guid: a0c783a84186cac4db7108d157a216cf
   - enabled: 1
+    path: Assets/Scenes/Tests_Scenes/Endgame_Test.unity
+    guid: fd26b0d10fd007240999ec5f57a998a0
+  - enabled: 0
     path: Assets/Scenes/GameOverScene.unity
     guid: 13ee65d18d6773844a9b9c8c6b36605a
   m_configObjects: {}

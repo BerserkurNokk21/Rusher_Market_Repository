@@ -6,10 +6,10 @@ using static JsonHelper;
 
 public class Item_List : MonoBehaviour
 {
-    public List<Product> products = new List<Product>(); // Lista de productos obtenidos de la base de datos
-    public List<Product> playerShoppingList = new List<Product>(); // Lista de productos que el jugador ha añadido
-    public string playerId; // ID del jugador
-    [SerializeField] private int listProductsLimit = 5; // Límite de productos
+    public List<Product> products = new List<Product>();
+    public List<Product> playerShoppingList = new List<Product>();
+    public string playerId;
+    [SerializeField] private int listProductsLimit = 5;
     private bool productsLoaded = false;
 
     // Referencia al ShoppingListManager para añadir el producto a la lista de compras
@@ -19,7 +19,7 @@ public class Item_List : MonoBehaviour
     {
         playerId = PlayerData.playerID;
         shoppingListManager = FindObjectOfType<ShoppingListManager>();
-        StartCoroutine(InitializeShoppingList()); // Inicializar la lista de compras
+        StartCoroutine(InitializeShoppingList());
     }
 
     // Coroutine para inicializar la lista de compras
@@ -70,7 +70,6 @@ public class Item_List : MonoBehaviour
 
         foreach (Product product in products)
         {
-            Debug.Log(itemsAdded);
             // Obtener un producto aleatorio de la lista de productos
             //IMPORTANTE VOLVER A DESCOMENTAR CUANDO TENGAMOS MAS ITEMS, SOLAMENTE ESTO ESTA COMENTADO PARA EL PROTOTIPO
             // Product randomProduct = products[Random.Range(0, products.Count)];

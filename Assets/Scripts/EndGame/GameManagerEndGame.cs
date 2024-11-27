@@ -10,8 +10,8 @@ public class GameManagerEndGame : MonoBehaviour
     void EndGame()
     {
         List<PlayerScore> players = new List<PlayerScore>();
-        
-            foreach (var player in players) 
+
+        foreach (var player in players)
         {
             players.Add(new PlayerScore(player.icon, player.name, player.score));
         }
@@ -19,5 +19,5 @@ public class GameManagerEndGame : MonoBehaviour
 
         podiumManager.SetupPodium(players);
     }
-    
+
 }

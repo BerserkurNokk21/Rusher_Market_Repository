@@ -1,20 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Item_Product : MonoBehaviour
 {
     //Asignamos el id del producto que queremos
-    public string id;
     [SerializeField] private string productName;
+    public string id;
     public Item_List item_List;
     public Product selectedProduct;
     public float points;
+    [SerializeField] private TextMeshProUGUI canvasNameItem;
 
     private ShoppingListManager shoppingListManager;
 
     void Start()
     {
+        canvasNameItem = GetComponentInChildren<TextMeshProUGUI>();
         shoppingListManager = FindObjectOfType<ShoppingListManager>();
         item_List = FindObjectOfType<Item_List>();
 
@@ -40,6 +43,7 @@ public class Item_Product : MonoBehaviour
                 {
                     selectedProduct = product;
                     productName = product.name;
+                    canvasNameItem.text = productName;
                     return;
                 }
                 else
@@ -53,6 +57,7 @@ public class Item_Product : MonoBehaviour
             Debug.LogWarning("No hay productos en la lista.");
         }
     }
+
     //public void RemoveFromShoppingList(Product product)
     //{
     //    if (product != null)

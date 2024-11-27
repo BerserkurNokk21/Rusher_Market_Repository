@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class UpdatePlayerCanvasData : MonoBehaviour
 {
-    public PlayerDataList playerDataList; // Referencia al script PlayerDataList
-    public TextMeshProUGUI playerPointsText; // Referencia al TextMeshProUGUI para mostrar puntos
-    [SerializeField] private bool isPlayerInitialized = false; // Indica si el jugador ha sido encontrado e inicializado
+    public PlayerDataList playerDataList;
+    public TextMeshProUGUI playerPointsText;
+    [SerializeField] private bool isPlayerInitialized = false;
 
     void Start()
     {

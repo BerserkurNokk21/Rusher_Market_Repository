@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameTimer : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class GameTimer : MonoBehaviour
     public float timeLeft;
 
     public TextMeshProUGUI timerText;
+    private string sceneName = "Endgame_Test";
 
 
     // Start is called before the first frame update
@@ -51,6 +53,6 @@ public class GameTimer : MonoBehaviour
     }
     void LoadGameOverScene()
     {
-        // Code to load the game over scene goes here
+        SceneManager.LoadScene(sceneName);
     }
 }

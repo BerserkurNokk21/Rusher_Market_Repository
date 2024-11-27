@@ -307,8 +307,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 359737061
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -333,7 +333,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 121831207
+  GlobalObjectIdHash: 1126526294
   InScenePlacedSourceGlobalObjectIdHash: 1126526294
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -453,6 +453,7 @@ MonoBehaviour:
   playerID: 
   playerName: 
   playerUsername: {fileID: 4107899969002709304}
+  playerPoints: 0
 --- !u!1 &4942838493224791309
 GameObject:
   m_ObjectHideFlags: 0
