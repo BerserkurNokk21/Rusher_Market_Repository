@@ -10,7 +10,7 @@ public class PlayerDataList : NetworkBehaviour
     public string playerName;
     public TextMeshProUGUI playerUsername;
 
-    //QUITAR DESPUES DE ENTREGA DE PROTOTIPO
+    //Dejar por el momento, posible uso futuro
     public float playerPoints;
     private void Start()
     {

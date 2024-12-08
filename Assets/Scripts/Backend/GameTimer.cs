@@ -12,14 +12,11 @@ public class GameTimer : MonoBehaviour
     public TextMeshProUGUI timerText;
     private string sceneName = "Endgame_Test";
 
-
-    // Start is called before the first frame update
     void Start()
     {
         isTimerRunning = true;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(isTimerRunning)
@@ -40,7 +37,6 @@ public class GameTimer : MonoBehaviour
             LoadGameOverScene();
         }
     }
-
 
     void UpdateTimer(float currentTimer)
     {

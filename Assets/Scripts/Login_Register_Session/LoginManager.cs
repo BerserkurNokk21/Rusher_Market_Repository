@@ -7,9 +7,9 @@ using static JsonHelper;
 
 public class LoginManager : MonoBehaviour
 {
-    public TMP_InputField usernameField; // Campo de entrada de nombre de usuario
-    public TMP_InputField passwordField; // Campo de entrada de contraseña
-    public TextMeshProUGUI resultText; // Texto de resultado para mostrar mensajes
+    public TMP_InputField usernameField;
+    public TMP_InputField passwordField;
+    public TextMeshProUGUI resultText;
 
     public void StartLogin()
     {
@@ -37,19 +37,7 @@ public class LoginManager : MonoBehaviour
 
                 try
                 {
-                    LoginResponse response = JsonUtility.FromJson<LoginResponse>(responseText);
-
-                    if (response.status == "success")
-                    {
-                        PlayerData.playerID = response.player_id;
-                        PlayerData.playerUsername = response.username;
-                        
-                        SceneManager.LoadScene("ListManager_Tests");
-                    }
-                    else
-                    {
-                        resultText.text = "Login failed!";
-                    }
+                    GetPlayerData(responseText);
                 }
                 catch (System.Exception e)
                 {
@@ -60,4 +48,20 @@ public class LoginManager : MonoBehaviour
         }
     }
 
+    private void GetPlayerData(string responseText)
+    {
+        LoginResponse response = JsonUtility.FromJson<LoginResponse>(responseText);
+
+        if (response.status == "success")
+        {
+            PlayerData.playerID = response.player_id;
+            PlayerData.playerUsername = response.username;
+
+            SceneManager.LoadScene("ListManager_Tests");
+        }
+        else
+        {
+            resultText.text = "Login failed!";
+        }
+    }
 }

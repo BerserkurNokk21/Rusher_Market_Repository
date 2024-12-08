@@ -71,8 +71,7 @@ public class Item_List : MonoBehaviour
         foreach (Product product in products)
         {
             // Obtener un producto aleatorio de la lista de productos
-            //IMPORTANTE VOLVER A DESCOMENTAR CUANDO TENGAMOS MAS ITEMS, SOLAMENTE ESTO ESTA COMENTADO PARA EL PROTOTIPO
-            // Product randomProduct = products[Random.Range(0, products.Count)];
+            Product randomProduct = products[Random.Range(0, products.Count)];
 
             Debug.Log("Añadiendo producto a la lista de compras: " + product.name);
 
@@ -166,6 +165,7 @@ public class Item_List : MonoBehaviour
     }
 }
 #region JSON Classes
+
 // Clase para envolver la lista de productos
 [System.Serializable]
 public class ProductListWrapper
@@ -195,4 +195,6 @@ public class ShoppingListMapping
     public string product_id;
     public string shopping_list_id;
 }
+
+
 #endregion

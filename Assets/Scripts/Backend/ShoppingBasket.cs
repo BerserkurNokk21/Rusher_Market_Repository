@@ -38,14 +38,12 @@ public class ShoppingBasket : MonoBehaviour
                     {
                         itemText.text = "Product found in the shopping list";
                         StartCoroutine(ClearItemText());
-                        Debug.Log("Producto encontrado en la lista de compras.");
                         DropItemInBasket();
                     }
                     else
                     {
-                        itemText.text = "Product not found in the shopping list";
+                        itemText.text = "Product found in the shopping list";
                         StartCoroutine(ClearItemText());
-                        Debug.LogWarning("Producto no instanciado en la lista del jugador: " + heldItem.id);
                     }
                 }
             }
