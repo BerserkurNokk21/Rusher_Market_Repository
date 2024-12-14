@@ -17,7 +17,7 @@ public class HostGameManager
     private string joinCode;
 
 	private Allocation allocation;
-    private const string GameScene = "Game";
+    private const string GameScene = "ListManager_Tests";
 
     public async Task StartHostAsync()
     {
@@ -48,12 +48,8 @@ public class HostGameManager
 
         UnityTransport transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
 
-        RelayServerData relayServerData = new RelayServerData(allocation, "udp");
+        RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
         transport.SetRelayServerData(relayServerData);
-
-        //NetworkManager.Singleton.StartHost();
-
-        //NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
 
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
 

@@ -7,6 +7,7 @@ using static JsonHelper;
 
 public class LoginManager : MonoBehaviour
 {
+    private string mainMenuScene = "MainMenu";
     public TMP_InputField usernameField;
     public TMP_InputField passwordField;
     public TextMeshProUGUI resultText;
@@ -57,7 +58,7 @@ public class LoginManager : MonoBehaviour
             PlayerData.playerID = response.player_id;
             PlayerData.playerUsername = response.username;
 
-            SceneManager.LoadScene("ListManager_Tests");
+            SceneManager.LoadScene(mainMenuScene);
         }
         else
         {

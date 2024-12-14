@@ -12,7 +12,6 @@ public enum AuthState
     Authenticated,
     Error,
     TimeOut
-
 } 
 
 public static class AuthenticationManager
@@ -45,6 +44,7 @@ public static class AuthenticationManager
     }
     private static async Task SignInAnonymouslyAsync(int maxTries = 5)
     {
+        stateAuth = AuthState.Authenticating;
         int tries = 0;
         while (stateAuth == AuthState.Authenticating && tries < maxTries)
         {
@@ -77,6 +77,7 @@ public static class AuthenticationManager
         if(stateAuth != AuthState.Authenticated)
         {
             Debug.LogError($"Authentication TimeOut in {tries}");
+            Debug.Log(stateAuth);
             stateAuth = AuthState.TimeOut;
         }
     }

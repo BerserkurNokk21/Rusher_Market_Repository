@@ -16,7 +16,7 @@ public class ClientGameManager
 {
     private JoinAllocation allocation;
 
-    private const string mainMenu = "MainMenu";
+    private const string mainMenu = "User_Session";
     public async Task<bool> InitAsync()
     {
         await UnityServices.InitializeAsync();
@@ -49,7 +49,7 @@ public class ClientGameManager
 
         UnityTransport transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
 
-        RelayServerData relayServerData = new RelayServerData(allocation, "udp");
+        RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
         transport.SetRelayServerData(relayServerData);
 
         NetworkManager.Singleton.StartClient();

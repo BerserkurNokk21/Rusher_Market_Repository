@@ -18,14 +18,15 @@ public class ClientSingleton : MonoBehaviour
             if (instance == null)
             {
                 Debug.LogError("No clientsingleton found in this scene");
+                return null;
             }
             return instance;
         }
     }
 
-    void Start()
+    private void Start()
     {
-        DontDestroyOnLoad(gameObject);        
+        DontDestroyOnLoad(gameObject);
     }
 
     public async Task<bool> CreateClient()
