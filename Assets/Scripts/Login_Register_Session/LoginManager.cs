@@ -4,10 +4,11 @@ using UnityEngine.Networking;
 using TMPro;
 using UnityEngine.SceneManagement;
 using static JsonHelper;
+using Unity.Netcode;
 
-public class LoginManager : MonoBehaviour
+public class LoginManager : NetworkBehaviour
 {
-    private string mainMenuScene = "MainMenu";
+    private string mainMenuScene = "NetBootstrap";
     public TMP_InputField usernameField;
     public TMP_InputField passwordField;
     public TextMeshProUGUI resultText;

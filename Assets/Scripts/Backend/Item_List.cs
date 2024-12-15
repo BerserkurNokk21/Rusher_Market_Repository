@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
 using static JsonHelper;
 
-public class Item_List : MonoBehaviour
+public class Item_List : NetworkBehaviour
 {
     public List<Product> products = new List<Product>();
     public List<Product> playerShoppingList = new List<Product>();
@@ -17,7 +18,6 @@ public class Item_List : MonoBehaviour
 
     void Start()
     {
-        playerId = PlayerData.playerID;
         shoppingListManager = FindObjectOfType<ShoppingListManager>();
         StartCoroutine(InitializeShoppingList());
     }
@@ -32,7 +32,7 @@ public class Item_List : MonoBehaviour
         if (productsLoaded)
         {
             AddProductsToShoppingList();
-            yield return StartCoroutine(RegisterPlayerShoppingListInDatabase()); // Registrar la lista de compras en la base de datos
+            /*yield return StartCoroutine(RegisterPlayerShoppingListInDatabase())*/; // Registrar la lista de compras en la base de datos
         }
     }
 
@@ -62,7 +62,7 @@ public class Item_List : MonoBehaviour
         }
     }
 
-    // Método para añadir productos de la tabla 'Products' a la lista de compras del jugador
+    // Método para añadir productos a la lista de la compra del jugador
     void AddProductsToShoppingList()
     {
         // Asegurarse de que no se agreguen más de los productos permitidos (listProductsLimit)
@@ -73,16 +73,16 @@ public class Item_List : MonoBehaviour
             // Obtener un producto aleatorio de la lista de productos
             Product randomProduct = products[Random.Range(0, products.Count)];
 
-            Debug.Log("Añadiendo producto a la lista de compras: " + product.name);
+            Debug.Log("Producto aleatorio: " + randomProduct.name);
 
             if (itemsAdded >= listProductsLimit)
                 break;
 
             // Añadir el producto aleatorio a la lista de compras si no está ya en ella
-            if (!playerShoppingList.Contains(product))
+            if (!playerShoppingList.Contains(randomProduct))
             {
-                playerShoppingList.Add(product);
-                shoppingListManager.AddItemToShoppingList(product.id, product.name);
+                playerShoppingList.Add(randomProduct);
+                shoppingListManager.AddItemToShoppingList(randomProduct.id, randomProduct.name);
                 itemsAdded++;
             }
         }
@@ -94,10 +94,12 @@ public class Item_List : MonoBehaviour
     }
 
     // Método para registrar la 'Shopping_List' en la base de datos
-    IEnumerator RegisterPlayerShoppingListInDatabase()
+    public IEnumerator RegisterPlayerShoppingListInDatabase(string idPlayer)
     {
         string uri = "http://localhost/unity_api/register_shopping_list.php";
         WWWForm form = new WWWForm();
+        playerId = idPlayer;
+        Debug.Log("Player ID: " + playerId);
         form.AddField("player_id", playerId);
 
         List<string> productIds = new List<string>();

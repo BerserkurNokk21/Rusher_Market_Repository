@@ -79,7 +79,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -122,12 +122,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf7c896708b9f4244abbfac41be5ee65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 10
+  attackCol: {fileID: 0}
   rb: {fileID: 0}
+  attackPos: {fileID: 0}
   nearbyItem: {fileID: 0}
-  isNearItem: 0
   heldItem: {fileID: 0}
+  stunned: 0
+  stunTime: 0
+  attackRadius: 0
+  isNearItem: 0
+  moveSpeed: 10
   itemCarryOffset: {x: 0.5, y: 0.5, z: 0}
+  moveDir: {x: 0, y: 0}
 --- !u!50 &3123829219264343628
 Rigidbody2D:
   serializedVersion: 4

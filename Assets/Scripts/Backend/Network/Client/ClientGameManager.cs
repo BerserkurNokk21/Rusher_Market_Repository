@@ -16,7 +16,7 @@ public class ClientGameManager
 {
     private JoinAllocation allocation;
 
-    private const string mainMenu = "User_Session";
+    private const string mainMenu = "MainMenu";
     public async Task<bool> InitAsync()
     {
         await UnityServices.InitializeAsync();
