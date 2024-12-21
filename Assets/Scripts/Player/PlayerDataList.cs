@@ -2,31 +2,32 @@ using System.Collections;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
-using Unity.Collections; // Para FixedString128Bytes
+using Unity.Collections;
 using static JsonHelper;
 
 public class PlayerDataList : NetworkBehaviour
 {
     private NetworkVariable<FixedString128Bytes> playerID = new NetworkVariable<FixedString128Bytes>();
     private NetworkVariable<FixedString128Bytes> playerNetworkName = new NetworkVariable<FixedString128Bytes>(
-        default, 
-        NetworkVariableReadPermission.Everyone, 
-        NetworkVariableWritePermission.Owner
+        default,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server // Solo el servidor puede escribir
     );
 
-    public TextMeshProUGUI playerUsername; // Referencia al campo de texto para mostrar el nombre del jugador
-    public float playerPoints; // Puntos del jugador (dejar para uso futuro)
+    [SerializeField] private string id;
+    [SerializeField] private string playerName;
+    public TextMeshProUGUI playerUsername;
+    public float playerPoints;
 
-    private Item_List itemListComponent; // Referencia a Item_List
+    private Item_List itemListComponent;
 
     public override void OnNetworkSpawn()
     {
-        if (IsOwner) // Solo el propietario del objeto inicializa su nombre
+        if (IsOwner) // Solo el propietario solicita el nombre al servidor
         {
-            playerID.Value = PlayerData.playerID;
-            playerNetworkName.Value = PlayerData.playerUsername;
-
-            Debug.Log($"[Owner] Player ID: {playerID.Value}, Player Name: {playerNetworkName.Value}");
+            SyncUpdatePlayerName(PlayerData.playerUsername, PlayerData.playerID);
+            id = PlayerData.playerID;
+            playerName = PlayerData.playerUsername;
         }
 
         // Escuchar cambios en el nombre del jugador
@@ -46,6 +47,15 @@ public class PlayerDataList : NetworkBehaviour
         {
             playerUsername.text = newValue.ToString();
         }
+    }
+
+    [ServerRpc]
+    private void SyncUpdatePlayerName(string _playerName, string _playerId)
+    {
+        playerNetworkName.Value = new FixedString128Bytes(_playerName);
+        playerID.Value = new FixedString128Bytes(_playerId);
+        id = _playerId;
+        playerName = _playerName;
     }
 
     private IEnumerator InitializePlayerShoppingList()
