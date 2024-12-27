@@ -25,7 +25,7 @@ public class PlayerDataList : NetworkBehaviour
     {
         if (IsOwner) // Solo el propietario solicita el nombre al servidor
         {
-            SyncUpdatePlayerName(PlayerData.playerUsername, PlayerData.playerID);
+            SyncUpdatePlayerNameServerRpc(PlayerData.playerUsername, PlayerData.playerID);
             id = PlayerData.playerID;
             playerName = PlayerData.playerUsername;
         }
@@ -50,7 +50,7 @@ public class PlayerDataList : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void SyncUpdatePlayerName(string _playerName, string _playerId)
+    private void SyncUpdatePlayerNameServerRpc(string _playerName, string _playerId)
     {
         playerNetworkName.Value = new FixedString128Bytes(_playerName);
         playerID.Value = new FixedString128Bytes(_playerId);

@@ -13,6 +13,7 @@ public class MainMenu : NetworkBehaviour
 
     public void Start()
     {
+        Debug.Log($"IsServer: {IsServer}, IsClient: {IsClient}, IsHost: {IsHost}");
         playerName.Value = PlayerData.playerUsername;
         playerUsername.text = playerName.Value;
     }
