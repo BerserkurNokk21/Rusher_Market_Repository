@@ -1,8 +1,10 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+
 
 
 public class Character_Controller : NetworkBehaviour
@@ -14,6 +16,7 @@ public class Character_Controller : NetworkBehaviour
     [SerializeField] private Item_Product nearbyItem;
     [SerializeField] public Item_Product heldItem; // El ítem que el jugador está sosteniendo
     [SerializeField] PlayerInputs _playerInputs;
+    [SerializeField] private CinemachineVirtualCamera _Vcamera;
     Enemy enemy;
 
     [Header("Player Settings")]
@@ -40,6 +43,19 @@ public class Character_Controller : NetworkBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
+    public override void OnNetworkDespawn()
+    {
+        if(IsOwner)
+        {
+            _Vcamera.Priority = 1;
+        }else
+        {
+            _Vcamera.Priority = 0;
+        }
+    }
+
+
+
     void Update()
     {
 
@@ -65,6 +81,8 @@ public class Character_Controller : NetworkBehaviour
         moveDir = _playerInputs.PlayerActions.Mover.ReadValue<Vector2>();
         rb.velocity = new Vector2(moveDir.x * moveSpeed, moveDir.y * moveSpeed);
     }
+
+    
     private void Hit()
     {
         if (_playerInputs.PlayerActions.Attack.triggered && heldItem==null)
