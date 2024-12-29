@@ -48,7 +48,8 @@ public class Character_Controller : NetworkBehaviour
         if(IsOwner)
         {
             _Vcamera.Priority = 1;
-        }else
+        }
+        else
         {
             _Vcamera.Priority = 0;
         }
