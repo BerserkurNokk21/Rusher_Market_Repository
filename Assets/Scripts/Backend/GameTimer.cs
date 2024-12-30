@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameTimer : NetworkBehaviour
 {
@@ -53,16 +54,71 @@ public class GameTimer : NetworkBehaviour
     {
         while (networkIsTimerRunning.Value && networkTimeLeft.Value > 0)
         {
-            yield return new WaitForSeconds(1f); // Reduce el tiempo cada segundo
+            yield return new WaitForSeconds(1f);
             networkTimeLeft.Value--;
         }
 
         if (networkTimeLeft.Value <= 0)
         {
             networkIsTimerRunning.Value = false;
-            LoadGameOverSceneClientRpc();
+            CollectPlayerScoresServerRpc(); // Recopila puntuaciones al terminar el tiempo
         }
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void CollectPlayerScoresServerRpc()
+    {
+        var scores = new List<PlayerScoreData>();
+
+        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            var playerObject = client.PlayerObject;
+            if (playerObject != null && playerObject.TryGetComponent(out PlayerDataList playerData))
+            {
+                scores.Add(new PlayerScoreData
+                {
+                    playerName = playerData.playerNetworkName.Value.ToString(),
+                    score = playerData.playerPoints
+                });
+                Debug.Log("Player score collected: " + playerData.playerPoints);
+            }
+        }
+
+        // Ordenar las puntuaciones de mayor a menor
+        scores.Sort((a, b) => b.score.CompareTo(a.score));
+
+        // Enviar las puntuaciones al cliente
+        SendScoresToPodiumClientRpc(scores.ToArray());
+    }
+
+    [ClientRpc]
+    private void SendScoresToPodiumClientRpc(PlayerScoreData[] scores)
+    {
+        if (scores == null || scores.Length == 0)
+        {
+            Debug.LogError("Scores array is null or empty. No scores were sent to the podium.");
+            return;
+        }
+
+        // Depurar cada puntuación recibida
+        Debug.Log("Scores sent to podium:");
+        foreach (var score in scores)
+        {
+            Debug.Log($"Player: {score.playerName}, Score: {score.score}");
+        }
+
+        // Almacenar los datos en la clase estática
+        GameData.PlayerScores = scores;
+
+        // Depurar el almacenamiento de datos
+        Debug.Log("Scores successfully stored in GameData.");
+
+        // Cargar la escena del podio
+        SceneManager.LoadScene(sceneName);
+        Debug.Log("Endgame scene loading initiated.");
+    }
+
+
 
     private void OnTimeChanged(int previousValue, int newValue)
     {
@@ -77,13 +133,6 @@ public class GameTimer : NetworkBehaviour
     private void OnTimerStateChanged(bool previousState, bool newState)
     {
         Debug.Log($"Timer state changed: {newState}");
-    }
-
-    [ClientRpc]
-    private void LoadGameOverSceneClientRpc()
-    {
-        Debug.Log("Loading endgame scene...");
-        SceneManager.LoadScene(sceneName);
     }
 
     public void RestartTimer()
@@ -101,4 +150,12 @@ public class GameTimer : NetworkBehaviour
         networkTimeLeft.OnValueChanged -= OnTimeChanged;
         networkIsTimerRunning.OnValueChanged -= OnTimerStateChanged;
     }
+
+    #region
+    public static class GameData
+    {
+        public static PlayerScoreData[] PlayerScores { get; set; }
+    }
+
+    #endregion
 }

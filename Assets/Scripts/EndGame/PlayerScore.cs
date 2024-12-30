@@ -1,17 +1,29 @@
-using System.Collections;
-using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerScore : MonoBehaviour
+public class PlayerScore : NetworkBehaviour
 {
-    public Sprite icon; 
-    public string name; 
-    public int score;   
+    public NetworkVariable<int> score = new NetworkVariable<int>(
+        default,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
 
-    public PlayerScore(Sprite icon, string name, int score)
+    public NetworkVariable<FixedString128Bytes> playerName = new NetworkVariable<FixedString128Bytes>(
+        default,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
+
+    public Sprite icon; // Esto puede ser sincronizado por otros medios si es necesario.
+
+    public void SetPlayerData(string name, int scoreValue)
     {
-        this.icon = icon;
-        this.name = name;
-        this.score = score;
+        if (IsServer)
+        {
+            playerName.Value = name;
+            score.Value = scoreValue;
+        }
     }
 }

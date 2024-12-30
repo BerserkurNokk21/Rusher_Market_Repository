@@ -43,13 +43,15 @@ public class Character_Controller : NetworkBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
-    public override void OnNetworkDespawn()
+    public override void OnNetworkSpawn()
     {
-        if(IsOwner)
+        _Vcamera = transform.GetComponentInChildren<CinemachineVirtualCamera>();
+        if (IsOwner && _Vcamera != null)
         {
-            _Vcamera.Priority = 1;
+            _Vcamera.Priority = 10;
+            _Vcamera.Follow = transform;
         }
-        else
+        else if (_Vcamera != null)
         {
             _Vcamera.Priority = 0;
         }

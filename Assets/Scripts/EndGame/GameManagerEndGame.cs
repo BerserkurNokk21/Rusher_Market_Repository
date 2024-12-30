@@ -1,23 +1,48 @@
-using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
-public class GameManagerEndGame : MonoBehaviour
+public class GameManagerEndGame : NetworkBehaviour
 {
     public PodiumManager podiumManager;
 
-
-    void EndGame()
+    [ServerRpc(RequireOwnership = false)]
+    public void EndGameServerRpc()
     {
-        List<PlayerScore> players = new List<PlayerScore>();
+        List<PlayerScoreData> playerScores = new List<PlayerScoreData>();
 
-        foreach (var player in players)
+        foreach (var playerObject in NetworkManager.Singleton.ConnectedClientsList)
         {
-            players.Add(new PlayerScore(player.icon, player.name, player.score));
+            PlayerScore playerScore = playerObject.PlayerObject.GetComponent<PlayerScore>();
+            if (playerScore != null)
+            {
+                var data = new PlayerScoreData
+                {
+                    playerName = new FixedString128Bytes(playerScore.playerName.Value),
+                    score = playerScore.score.Value
+                };
+                playerScores.Add(data);
+            }
         }
 
+        playerScores.Sort((a, b) => b.score.CompareTo(a.score));
 
-        podiumManager.SetupPodium(players);
+        //SendScoresToPodiumClientRpc(playerScores.ToArray());
     }
+
+    //[ClientRpc]
+    //private void SendScoresToPodiumClientRpc(PlayerScoreData[] scores)
+    //{
+    //    if (IsClient && podiumManager != null)
+    //    {
+    //        // Convertir el arreglo a una lista para manipulación (opcional)
+    //        List<PlayerScoreData> playerScores = new List<PlayerScoreData>(scores);
+
+    //        // Pasar la lista convertida a arreglo
+    //        podiumManager.SetupPodium(playerScores.ToArray());
+    //    }
+    //}
+
 
 }
