@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
+using Unity.Services.Lobbies;
+using Unity.Services.Lobbies.Models;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
@@ -13,10 +15,11 @@ using UnityEngine.SceneManagement;
 
 public class HostGameManager
 {
-    private const int MaxConnections = 10;
+    private const int MaxConnections = 4;
     private string joinCode;
 
 	private Allocation allocation;
+    private string lobbyId;
     private const string GameScene = "ListManager_Tests";
 
     public async Task StartHostAsync()
@@ -38,6 +41,7 @@ public class HostGameManager
             joinCode = await Relay.Instance.GetJoinCodeAsync(allocation.AllocationId);
             Debug.Log("Join code: " + joinCode);
 
+
         }
         catch (Exception ex)
         {
@@ -45,11 +49,38 @@ public class HostGameManager
             Debug.LogWarning(ex);
             return;
         }
+        
 
         UnityTransport transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
 
         RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
         transport.SetRelayServerData(relayServerData);
+
+        try
+        {
+            CreateLobbyOptions lobbyOptions = new CreateLobbyOptions();
+            lobbyOptions.IsPrivate = false;
+            lobbyOptions.Data = new Dictionary<string, DataObject>()
+            {
+                {
+                    "JoinCode", new DataObject(
+                        visibility: DataObject.VisibilityOptions.Member,
+                        value: joinCode
+                        )
+                }
+            };
+
+            Lobby lobby = await Lobbies.Instance.CreateLobbyAsync("Sample Lobby name", MaxConnections, lobbyOptions);
+
+            lobbyId = lobby.Id;
+
+            HostSingleton.Instance.StartCoroutine(HeartbeatLobby(15));
+        }
+        catch (LobbyServiceException ex)
+        {
+            Debug.Log(ex);
+            return;
+        }
 
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
 
@@ -59,5 +90,15 @@ public class HostGameManager
         }
 
         NetworkManager.Singleton.StartHost();
+    }
+
+    private IEnumerator HeartbeatLobby(float waitTimeSeconds)
+    {
+        WaitForSecondsRealtime delay = new WaitForSecondsRealtime(waitTimeSeconds);
+        while (true)
+        {
+            Lobbies.Instance.SendHeartbeatPingAsync(lobbyId);
+            yield return delay;
+        }
     }
 }
