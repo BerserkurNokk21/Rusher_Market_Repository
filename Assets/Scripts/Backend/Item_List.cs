@@ -104,7 +104,6 @@ public class Item_List : NetworkBehaviour
         string uri = "http://localhost/unity_api/register_shopping_list.php";
         WWWForm form = new WWWForm();
         gameID = LobbyData.lobbyDB_ID;
-        Debug.Log("Player ID: " + playerId);
         form.AddField("player_id", playerId);
         form.AddField("game_id", gameID);
 
