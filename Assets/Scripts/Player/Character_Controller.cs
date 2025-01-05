@@ -82,7 +82,6 @@ public class Character_Controller : NetworkBehaviour
 
     void Move()
     {
-        Debug.Log("Move");
         moveDir = _playerInputs.PlayerActions.Mover.ReadValue<Vector2>();
         rb.velocity = new Vector2(moveDir.x * moveSpeed, moveDir.y * moveSpeed);
     }
@@ -92,7 +91,6 @@ public class Character_Controller : NetworkBehaviour
     {
         if (_playerInputs.PlayerActions.Attack.triggered && heldItem==null)
         {
-            Debug.Log("Attack");
             Collider2D[] enemigos = Physics2D.OverlapCircleAll(attackPos.position, attackRadius, LayerMask.GetMask("Enemigos"));
 
             foreach(Collider2D enemigo in enemigos) {
@@ -125,7 +123,7 @@ public class Character_Controller : NetworkBehaviour
     {
         if (heldItem!=null)
         {
-            Destroy(heldItem);
+            Destroy(heldItem.gameObject);
         }
     }
 

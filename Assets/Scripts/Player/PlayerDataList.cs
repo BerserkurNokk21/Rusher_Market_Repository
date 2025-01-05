@@ -37,7 +37,7 @@ public class PlayerDataList : NetworkBehaviour
         OnPlayerNameChanged(default, playerNetworkName.Value);
 
         // Llamar a la función para registrar la lista del jugador
-        StartCoroutine(InitializePlayerShoppingList());
+        InitializePlayerShoppingList();
     }
 
     private void OnPlayerNameChanged(FixedString128Bytes oldValue, FixedString128Bytes newValue)
@@ -58,7 +58,7 @@ public class PlayerDataList : NetworkBehaviour
         playerName = _playerName;
     }
 
-    private IEnumerator InitializePlayerShoppingList()
+    private void InitializePlayerShoppingList()
     {
         // Obtener el componente Item_List en la escena
         if (itemListComponent == null)
@@ -68,9 +68,7 @@ public class PlayerDataList : NetworkBehaviour
 
         if (itemListComponent != null)
         {
-            // Llamamos a la función de Item_List para registrar la lista del jugador
-            yield return StartCoroutine(itemListComponent.RegisterPlayerShoppingListInDatabase(PlayerData.playerID));
-            Debug.Log("Player shopping list initialized for ID: " + PlayerData.playerID);
+            itemListComponent.playerId = PlayerData.playerID;
         }
         else
         {

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.Networking;
 using static JsonHelper;
@@ -10,6 +11,7 @@ public class Item_List : NetworkBehaviour
     public List<Product> products = new List<Product>();
     public List<Product> playerShoppingList = new List<Product>();
     public string playerId;
+    public string gameID;
     [SerializeField] private int listProductsLimit = 5;
     private bool productsLoaded = false;
 
@@ -32,7 +34,7 @@ public class Item_List : NetworkBehaviour
         if (productsLoaded)
         {
             AddProductsToShoppingList();
-            /*yield return StartCoroutine(RegisterPlayerShoppingListInDatabase())*/; // Registrar la lista de compras en la base de datos
+            //yield return StartCoroutine(RegisterPlayerShoppingListInDatabase());
         }
     }
 
@@ -73,8 +75,6 @@ public class Item_List : NetworkBehaviour
             // Obtener un producto aleatorio de la lista de productos
             Product randomProduct = products[Random.Range(0, products.Count)];
 
-            Debug.Log("Producto aleatorio: " + randomProduct.name);
-
             if (itemsAdded >= listProductsLimit)
                 break;
 
@@ -87,6 +87,11 @@ public class Item_List : NetworkBehaviour
             }
         }
 
+        StartCoroutine(RegisterPlayerShoppingListInDatabase());
+
+        // Vaciar la lista de compras del jugador para el siguiente jugador
+        playerShoppingList.Clear();
+
         if (itemsAdded == 0)
         {
             Debug.LogWarning("No se añadieron productos a la lista de compras.");
@@ -94,13 +99,14 @@ public class Item_List : NetworkBehaviour
     }
 
     // Método para registrar la 'Shopping_List' en la base de datos
-    public IEnumerator RegisterPlayerShoppingListInDatabase(string idPlayer)
+    public IEnumerator RegisterPlayerShoppingListInDatabase()
     {
         string uri = "http://localhost/unity_api/register_shopping_list.php";
         WWWForm form = new WWWForm();
-        playerId = idPlayer;
+        gameID = LobbyData.lobbyDB_ID;
         Debug.Log("Player ID: " + playerId);
         form.AddField("player_id", playerId);
+        form.AddField("game_id", gameID);
 
         List<string> productIds = new List<string>();
         foreach (Product product in playerShoppingList)

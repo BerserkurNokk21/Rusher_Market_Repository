@@ -28,4 +28,10 @@ public static class JsonHelper
         public static string playerID;
         public static string playerUsername;
     }
+
+    public static class Lobbydata
+    {
+        public static string lobbyId;
+        public static string lobbyDB_ID;
+    }
 }

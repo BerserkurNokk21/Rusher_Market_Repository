@@ -1430,6 +1430,7 @@ GameObject:
   - component: {fileID: 852696036}
   - component: {fileID: 852696037}
   - component: {fileID: 852696038}
+  - component: {fileID: 852696039}
   m_Layer: 0
   m_Name: LobbyManager
   m_TagString: Untagged
@@ -1464,7 +1465,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5b7d6c315cc00145a18f9689c283c73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialTimeLeft: 20
+  initialTimeLeft: 5000
   timerText: {fileID: 239291455}
 --- !u!114 &852696038
 MonoBehaviour:
@@ -1487,6 +1488,18 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &852696039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852696035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 137b800241a62c14688e17f13264b0be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &999150003
 GameObject:
   m_ObjectHideFlags: 0
@@ -2309,7 +2322,7 @@ MonoBehaviour:
   m_UiScaleMode: 0
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3

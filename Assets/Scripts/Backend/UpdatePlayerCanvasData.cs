@@ -33,7 +33,6 @@ public class UpdatePlayerCanvasData : MonoBehaviour
             // Si se encuentra, marca como inicializado y rompe el bucle
             if (playerDataList != null)
             {
-                Debug.Log("PlayerDataList encontrado e inicializado.");
                 isPlayerInitialized = true;
             }
 
