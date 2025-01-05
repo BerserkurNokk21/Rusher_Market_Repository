@@ -39,6 +39,8 @@ public class Character_Controller : NetworkBehaviour
 
         // Acción para coger el ítem
         _playerInputs.PlayerActions.PickItem.performed += ctx => PickUpItem();
+        //Soltar el item
+        _playerInputs.PlayerActions.DropItem.performed += ctx => DropItem();
 
         rb = GetComponent<Rigidbody2D>();
     }
@@ -118,6 +120,15 @@ public class Character_Controller : NetworkBehaviour
             heldItem = nearbyItem;
         }
     }
+
+    void DropItem()
+    {
+        if (heldItem!=null)
+        {
+            Destroy(heldItem);
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Item_Product item = collision.GetComponent<Item_Product>();
