@@ -17,6 +17,7 @@ public class ShoppingBasket : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        Debug.Log("Collision detected");
         player = collision.GetComponent<Character_Controller>();
         if (player != null && player.heldItem != null)
         {
@@ -39,11 +40,6 @@ public class ShoppingBasket : MonoBehaviour
                         itemText.text = "Product found in the shopping list";
                         StartCoroutine(ClearItemText());
                         DropItemInBasket();
-                    }
-                    else
-                    {
-                        itemText.text = "Product found in the shopping list";
-                        StartCoroutine(ClearItemText());
                     }
                 }
             }

@@ -4,6 +4,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Services.Lobbies.Models;
+using UnityEngine.InputSystem;
+using UnityEngine.Networking;
+using System;
 
 public class GameTimer : NetworkBehaviour
 {
@@ -11,6 +15,7 @@ public class GameTimer : NetworkBehaviour
     public int initialTimeLeft = 300; // Tiempo inicial en segundos
     public TextMeshProUGUI timerText;
     private string sceneName = "Endgame_Test";
+    public Item_List item_list;
 
     // NetworkVariables para sincronización
     private NetworkVariable<int> networkTimeLeft = new NetworkVariable<int>(
@@ -69,6 +74,7 @@ public class GameTimer : NetworkBehaviour
     private void CollectPlayerScoresServerRpc()
     {
         var scores = new List<PlayerScoreData>();
+        string idChampion = "";
 
         foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
         {
@@ -78,6 +84,7 @@ public class GameTimer : NetworkBehaviour
                 scores.Add(new PlayerScoreData
                 {
                     playerName = playerData.playerNetworkName.Value.ToString(),
+                    playerId = playerData.playerID.Value.ToString(),
                     score = playerData.playerPoints
                 });
                 Debug.Log("Player score collected: " + playerData.playerPoints);
@@ -87,9 +94,13 @@ public class GameTimer : NetworkBehaviour
         // Ordenar las puntuaciones de mayor a menor
         scores.Sort((a, b) => b.score.CompareTo(a.score));
 
+        idChampion = scores[0].playerId.ToString();
+
+        SendIdChampion(idChampion);
         // Enviar las puntuaciones al cliente
         SendScoresToPodiumClientRpc(scores.ToArray());
     }
+
 
     [ClientRpc]
     private void SendScoresToPodiumClientRpc(PlayerScoreData[] scores)
@@ -99,19 +110,13 @@ public class GameTimer : NetworkBehaviour
             Debug.LogError("Scores array is null or empty. No scores were sent to the podium.");
             return;
         }
-
-        // Depurar cada puntuación recibida
-        Debug.Log("Scores sent to podium:");
         foreach (var score in scores)
         {
-            Debug.Log($"Player: {score.playerName}, Score: {score.score}");
+            Debug.Log($"Player: {score.playerName}, Score: {score.score}, Id{score.playerId}");
         }
 
         // Almacenar los datos en la clase estática
         GameData.PlayerScores = scores;
-
-        // Depurar el almacenamiento de datos
-        Debug.Log("Scores successfully stored in GameData.");
 
         // Cargar la escena del podio
         SceneManager.LoadScene(sceneName);
@@ -142,6 +147,35 @@ public class GameTimer : NetworkBehaviour
 
         Debug.Log($"Timer restarted with {initialTimeLeft} seconds");
         StartCoroutine(TimerLoop());
+    }
+
+
+    private void SendIdChampion(string idChampion)
+    {
+        Debug.Log("Sending champion data to the database " + idChampion);
+        string uri = "http://localhost/unity_api/update_game_champion.php";
+        WWWForm form = new WWWForm();
+
+        form.AddField("game_id", LobbyData.lobbyDB_ID);
+        //form.AddField("time_played", initialTimeLeft);
+        form.AddField("player_champion", idChampion);
+
+        StartCoroutine(SendChampionData(uri, form));
+    }
+
+    private IEnumerator SendChampionData(string uri, WWWForm form)
+    {
+        UnityWebRequest www = UnityWebRequest.Post(uri, form);
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError("Error updating champion: " + www.error);
+        }
+        else
+        {
+            Debug.Log("Champion updated successfully");
+        }
     }
 
     private void OnDestroy()

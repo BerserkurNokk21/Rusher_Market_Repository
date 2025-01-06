@@ -1465,8 +1465,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5b7d6c315cc00145a18f9689c283c73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialTimeLeft: 5000
+  initialTimeLeft: 25
   timerText: {fileID: 239291455}
+  item_list: {fileID: 999150006}
 --- !u!114 &852696038
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1562,6 +1563,7 @@ MonoBehaviour:
   products: []
   playerShoppingList: []
   playerId: 
+  gameID: 
   listProductsLimit: 5
 --- !u!114 &999150007
 MonoBehaviour:
@@ -1641,8 +1643,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -1496956651
-  m_SortingLayer: 2
+  m_SortingLayerID: 359737061
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 3f57582377c31db41981e38915eff048, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

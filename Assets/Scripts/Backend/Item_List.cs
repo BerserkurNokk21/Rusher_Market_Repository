@@ -90,7 +90,7 @@ public class Item_List : NetworkBehaviour
         StartCoroutine(RegisterPlayerShoppingListInDatabase());
 
         // Vaciar la lista de compras del jugador para el siguiente jugador
-        playerShoppingList.Clear();
+        //playerShoppingList.Clear();
 
         if (itemsAdded == 0)
         {

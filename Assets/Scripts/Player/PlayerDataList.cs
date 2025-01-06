@@ -7,7 +7,7 @@ using static JsonHelper;
 
 public class PlayerDataList : NetworkBehaviour
 {
-    private NetworkVariable<FixedString128Bytes> playerID = new NetworkVariable<FixedString128Bytes>();
+    public NetworkVariable<FixedString128Bytes> playerID = new NetworkVariable<FixedString128Bytes>();
     public NetworkVariable<FixedString128Bytes> playerNetworkName = new NetworkVariable<FixedString128Bytes>(
         default,
         NetworkVariableReadPermission.Everyone,
