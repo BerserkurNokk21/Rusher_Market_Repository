@@ -152,7 +152,6 @@ public class GameTimer : NetworkBehaviour
 
     private void SendIdChampion(string idChampion)
     {
-        Debug.Log("Sending champion data to the database " + idChampion);
         string uri = "http://localhost/unity_api/update_game_champion.php";
         WWWForm form = new WWWForm();
 

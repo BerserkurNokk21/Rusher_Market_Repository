@@ -20,6 +20,7 @@ public class PlayerDataList : NetworkBehaviour
     public float playerPoints;
 
     private Item_List itemListComponent;
+    private PlayerHistoricalManager playerHistoricalManager;
 
     public override void OnNetworkSpawn()
     {
@@ -38,6 +39,17 @@ public class PlayerDataList : NetworkBehaviour
 
         // Llamar a la función para registrar la lista del jugador
         InitializePlayerShoppingList();
+
+        // Llamar al script PlayerHistoricalManager y pasarle el id del jugador
+        playerHistoricalManager = FindObjectOfType<PlayerHistoricalManager>();
+        if (playerHistoricalManager != null)
+        {
+            playerHistoricalManager.RegisterPlayerHistory(id);
+        }
+        else
+        {
+            Debug.LogError("PlayerHistoricalManager script not found in the scene!");
+        }
     }
 
     private void OnPlayerNameChanged(FixedString128Bytes oldValue, FixedString128Bytes newValue)
