@@ -2,7 +2,6 @@ using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -21,6 +20,7 @@ public class Character_Controller : NetworkBehaviour
     [SerializeField] private Animator anim;
     [SerializeField] private SpriteRenderer sp;
     Enemy enemy;
+    PlayerDataList playerData;
 
     [Header("Player Settings")]
     [SerializeField] private bool stunned;
@@ -48,7 +48,7 @@ public class Character_Controller : NetworkBehaviour
         attackCol = GetComponentInChildren<Collider2D>();
         anim = GetComponent<Animator>();
         sp = GetComponent<SpriteRenderer>();
-
+        playerData = GetComponent<PlayerDataList>();
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -85,23 +85,7 @@ public class Character_Controller : NetworkBehaviour
             StartCoroutine("Stun");
         }
 
-        if (moveDir.x >= 0.1f || moveDir.y>=0.1 || moveDir.x<=-0.1||moveDir.y<=-0.1)
-        {
-            anim.SetBool("Move", true);
-            if (moveDir.x <= -0.1 || moveDir.y <= -0.1)
-            {
-                sp.flipX = true;
-                
-            }
-            else
-            {
-                sp.flipX= false;
-            }
-        }
-        else
-        {
-            anim.SetBool("Move",false);
-        }
+        
 
     }
 
@@ -109,33 +93,63 @@ public class Character_Controller : NetworkBehaviour
     {
         moveDir = _playerInputs.PlayerActions.Mover.ReadValue<Vector2>();
         rb.velocity = new Vector2(moveDir.x * moveSpeed, moveDir.y * moveSpeed);
+        if (moveDir.x >= 0.1f || moveDir.y >= 0.1 || moveDir.x <= -0.1 || moveDir.y <= -0.1)
+        {
+            anim.SetBool("Move", true);
+            anim.SetBool("Idle", false);
+            if (moveDir.x <= -0.1 || moveDir.y <= -0.1)
+            {
+                sp.flipX = true;
+                // Girar la posición del punto de ataque
+                attackPos.localPosition = new Vector3(-Mathf.Abs(attackPos.localPosition.x), attackPos.localPosition.y, attackPos.localPosition.z);
+            }
+            else
+            {
+                sp.flipX = false;
+                // Restaurar la posición original del punto de ataque
+                attackPos.localPosition = new Vector3(Mathf.Abs(attackPos.localPosition.x), attackPos.localPosition.y, attackPos.localPosition.z);
+            }
+        }
+        else
+        {
+            anim.SetBool("Idle", true);
+            anim.SetBool("Move", false);
+        }
     }
 
-    
+
     private void Hit()
     {
-        if (_playerInputs.PlayerActions.Attack.triggered && heldItem==null)
+        if (_playerInputs.PlayerActions.Attack.triggered && heldItem == null)
         {
             Collider2D[] enemigos = Physics2D.OverlapCircleAll(attackPos.position, attackRadius, LayerMask.GetMask("Enemigos"));
             anim.SetBool("Hit", true);
+            anim.SetBool("Idle", false);
 
-            foreach(Collider2D enemigo in enemigos) {
+            foreach (Collider2D enemigo in enemigos)
+            {
                 Character_Controller player = enemigo.GetComponent<Character_Controller>();
-
-                if(player.NetworkObjectId != this.NetworkObjectId)
-                {
-                    HitEnemy(player.gameObject,stunned);
-                }
+                HitEnemy(player.gameObject, stunned);
             }
+            StartCoroutine("FinishAttack");
+
         }
+    }
+    IEnumerator FinishAttack()
+    {
+        yield return new WaitForSeconds(1f);
+        anim.SetBool("Hit", true);
+        anim.SetBool("Idle", false);
     }
 
     IEnumerator Stun()
     {
         attackCol.enabled = false;
         anim.SetBool("Stun", true);
+        anim.SetBool("Idle", false);
         yield return new WaitForSeconds(stunTime);
         anim.SetBool("Stun",false);
+        anim.SetBool("Idle", true);
         attackCol.enabled = true;
         StopCoroutine("Stun");
     }
@@ -183,6 +197,8 @@ public class Character_Controller : NetworkBehaviour
     private void HitEnemy(GameObject target, bool stunned)
     {
         target.GetComponent<Character_Controller>().stunned = true;
+        target.GetComponent<Character_Controller>().anim.SetBool("Stun", true);
+        target.GetComponent<Character_Controller>().SetHitFalse();
     }
 
     private void OnDrawGizmos()

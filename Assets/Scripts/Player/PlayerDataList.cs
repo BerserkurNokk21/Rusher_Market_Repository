@@ -14,7 +14,7 @@ public class PlayerDataList : NetworkBehaviour
         NetworkVariableWritePermission.Server // Solo el servidor puede escribir
     );
 
-    [SerializeField] private string id;
+    [SerializeField] public string id;
     [SerializeField] private string playerName;
     public TextMeshProUGUI playerUsername;
     public float playerPoints;
