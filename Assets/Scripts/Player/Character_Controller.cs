@@ -2,6 +2,7 @@ using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,7 +18,8 @@ public class Character_Controller : NetworkBehaviour
     [SerializeField] public Item_Product heldItem; // El ítem que el jugador está sosteniendo
     [SerializeField] PlayerInputs _playerInputs;
     [SerializeField] private CinemachineVirtualCamera _Vcamera;
-    [SerializeField] public Animator anim;
+    [SerializeField] private Animator anim;
+    [SerializeField] private SpriteRenderer sp;
     Enemy enemy;
 
     [Header("Player Settings")]
@@ -44,6 +46,8 @@ public class Character_Controller : NetworkBehaviour
         _playerInputs.PlayerActions.DropItem.performed += ctx => DropItem();
 
         attackCol = GetComponentInChildren<Collider2D>();
+        anim = GetComponent<Animator>();
+        sp = GetComponent<SpriteRenderer>();
 
         rb = GetComponent<Rigidbody2D>();
     }
@@ -81,9 +85,18 @@ public class Character_Controller : NetworkBehaviour
             StartCoroutine("Stun");
         }
 
-        if (moveDir.x >= 0.1f || moveDir.y>=0.1)
+        if (moveDir.x >= 0.1f || moveDir.y>=0.1 || moveDir.x<=-0.1||moveDir.y<=-0.1)
         {
             anim.SetBool("Move", true);
+            if (moveDir.x <= -0.1 || moveDir.y <= -0.1)
+            {
+                sp.flipX = true;
+                
+            }
+            else
+            {
+                sp.flipX= false;
+            }
         }
         else
         {
