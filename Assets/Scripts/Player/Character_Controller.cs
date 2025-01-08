@@ -17,6 +17,7 @@ public class Character_Controller : NetworkBehaviour
     [SerializeField] public Item_Product heldItem; // El ítem que el jugador está sosteniendo
     [SerializeField] PlayerInputs _playerInputs;
     [SerializeField] private CinemachineVirtualCamera _Vcamera;
+    [SerializeField] public Animator anim;
     Enemy enemy;
 
     [Header("Player Settings")]
@@ -80,6 +81,15 @@ public class Character_Controller : NetworkBehaviour
             StartCoroutine("Stun");
         }
 
+        if (moveDir.x >= 0.1f || moveDir.y>=0.1)
+        {
+            anim.SetBool("Move", true);
+        }
+        else
+        {
+            anim.SetBool("Move",false);
+        }
+
     }
 
     void Move()
@@ -94,6 +104,7 @@ public class Character_Controller : NetworkBehaviour
         if (_playerInputs.PlayerActions.Attack.triggered && heldItem==null)
         {
             Collider2D[] enemigos = Physics2D.OverlapCircleAll(attackPos.position, attackRadius, LayerMask.GetMask("Enemigos"));
+            anim.SetBool("Hit", true);
 
             foreach(Collider2D enemigo in enemigos) {
                 Character_Controller player = enemigo.GetComponent<Character_Controller>();
@@ -109,7 +120,9 @@ public class Character_Controller : NetworkBehaviour
     IEnumerator Stun()
     {
         attackCol.enabled = false;
+        anim.SetBool("Stun", true);
         yield return new WaitForSeconds(stunTime);
+        anim.SetBool("Stun",false);
         attackCol.enabled = true;
         StopCoroutine("Stun");
     }
@@ -162,5 +175,10 @@ public class Character_Controller : NetworkBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(attackPos.position, attackRadius);
+    }
+
+    public void SetHitFalse()
+    {
+        anim.SetBool("Hit",false);
     }
 }
