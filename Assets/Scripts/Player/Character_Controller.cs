@@ -42,6 +42,8 @@ public class Character_Controller : NetworkBehaviour
         //Soltar el item
         _playerInputs.PlayerActions.DropItem.performed += ctx => DropItem();
 
+        attackCol = GetComponentInChildren<Collider2D>();
+
         rb = GetComponent<Rigidbody2D>();
     }
 
