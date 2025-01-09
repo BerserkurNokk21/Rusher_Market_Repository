@@ -27,6 +27,7 @@ public static class JsonHelper
     {
         public static string playerID;
         public static string playerUsername;
+        public static float playerPoints;
     }
 
     public static class Lobbydata

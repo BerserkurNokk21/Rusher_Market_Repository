@@ -71,11 +71,17 @@ public class ShoppingBasket : MonoBehaviour
 
     public void AddPoints(float points)
     {
-        PlayerDataList playerDataList = FindObjectOfType<PlayerDataList>();
+        // Obtener el PlayerDataList asociado al jugador que colisionó
+        PlayerDataList playerDataList = player.GetComponent<PlayerDataList>();
 
         if (playerDataList != null)
         {
+            Debug.Log($"Adding points to player {playerDataList.id}: {points}");
             playerDataList.AddPoints(points);
+        }
+        else
+        {
+            Debug.LogError("PlayerDataList not found on the player!");
         }
     }
 }

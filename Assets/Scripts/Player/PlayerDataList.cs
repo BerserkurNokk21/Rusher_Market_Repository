@@ -13,26 +13,34 @@ public class PlayerDataList : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server // Solo el servidor puede escribir
     );
+    public NetworkVariable<float> playerPointsnetwork = new NetworkVariable<float>(
+        0f,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
 
-    [SerializeField] public string id;
-    [SerializeField] private string playerName;
+
     public TextMeshProUGUI playerUsername;
     public float playerPoints;
-
+    [SerializeField] public string id;
+    [SerializeField] private string playerName;
     private Item_List itemListComponent;
     private PlayerHistoricalManager playerHistoricalManager;
 
     public override void OnNetworkSpawn()
     {
-        if (IsOwner) // Solo el propietario solicita el nombre al servidor
-        {
-            SyncUpdatePlayerNameServerRpc(PlayerData.playerUsername, PlayerData.playerID);
-            id = PlayerData.playerID;
-            playerName = PlayerData.playerUsername;
-        }
+        SyncUpdatePlayerNameServerRpc(PlayerData.playerUsername, PlayerData.playerID, PlayerData.playerPoints);
+        id = PlayerData.playerID;
+        playerName = PlayerData.playerUsername;
+        playerPoints = PlayerData.playerPoints;
 
         // Escuchar cambios en el nombre del jugador
         playerNetworkName.OnValueChanged += OnPlayerNameChanged;
+
+        // Escuchar cambios en los puntos del jugador
+        playerPointsnetwork.OnValueChanged += OnPlayerPointsChanged;
+
+        OnPlayerPointsChanged(0, playerPointsnetwork.Value);
 
         // Actualizar la UI inicial si el nombre ya está sincronizado
         OnPlayerNameChanged(default, playerNetworkName.Value);
@@ -62,12 +70,13 @@ public class PlayerDataList : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void SyncUpdatePlayerNameServerRpc(string _playerName, string _playerId)
+    private void SyncUpdatePlayerNameServerRpc(string _playerName, string _playerId, float _points)
     {
         playerNetworkName.Value = new FixedString128Bytes(_playerName);
         playerID.Value = new FixedString128Bytes(_playerId);
         id = _playerId;
         playerName = _playerName;
+        playerPoints = _points;
     }
 
     private void InitializePlayerShoppingList()
@@ -90,15 +99,47 @@ public class PlayerDataList : NetworkBehaviour
 
     public void AddPoints(float points)
     {
-        if (!IsOwner)
-            return;
-
-        playerPoints += points;
+        if (IsOwner)
+        {
+            Debug.Log($"Player {id} adding points: {points}");
+            SyncUpdatePointsServerRpc(points);
+        }
     }
 
+    [ServerRpc]
+    private void SyncUpdatePointsServerRpc(float points)
+    {
+        Debug.Log($"Server received points update for player {id}: {points}");
+        playerPointsnetwork.Value += points;
+
+        // Propagar los puntos a todos los clientes
+        UpdatePointsClientRpc(playerPointsnetwork.Value);
+    }
+    [ClientRpc]
+    private void UpdatePointsClientRpc(float newPoints)
+    {
+        if (!IsOwner) return; // Solo actualizar si es nuestro jugador
+
+        Debug.Log($"Client {id} received points update: {newPoints}");
+        playerPoints = newPoints;
+    }
+    private void OnPlayerPointsChanged(float previousValue, float newValue)
+    {
+        if (!IsOwner) return; // Solo actualizar si es nuestro jugador
+
+        Debug.Log($"Points changed for player {id}: {previousValue} -> {newValue}");
+        playerPoints = newValue;
+    }
     private void OnDestroy()
     {
-        // Limpiar el evento para evitar errores de referencia nula
-        playerNetworkName.OnValueChanged -= OnPlayerNameChanged;
+        if (playerPointsnetwork != null)
+            playerPointsnetwork.OnValueChanged -= OnPlayerPointsChanged;
+        if (playerNetworkName != null)
+            playerNetworkName.OnValueChanged -= OnPlayerNameChanged;
+    }
+
+    public float GetCurrentPoints()
+    {
+        return playerPointsnetwork.Value;
     }
 }

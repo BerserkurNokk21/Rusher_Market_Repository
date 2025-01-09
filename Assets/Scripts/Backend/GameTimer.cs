@@ -85,7 +85,7 @@ public class GameTimer : NetworkBehaviour
                 {
                     playerName = playerData.playerNetworkName.Value.ToString(),
                     playerId = playerData.playerID.Value.ToString(),
-                    score = playerData.playerPoints
+                    score = playerData.playerPointsnetwork.Value,
                 });
                 Debug.Log("Player score collected: " + playerData.playerPoints);
             }
