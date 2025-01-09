@@ -30,7 +30,7 @@ public class Character_Controller : NetworkBehaviour
     );
 
     [SerializeField] private bool stunned;
-    [SerializeField] private float stunTime;
+    [SerializeField] private float stunTime = 2f;
     [SerializeField] private float attackRadius;
     [SerializeField] private bool isNearItem = false;
     public float moveSpeed;
@@ -76,7 +76,6 @@ public class Character_Controller : NetworkBehaviour
 
     void Update()
     {
-
         if (!IsOwner){
             return;
         }
@@ -86,13 +85,6 @@ public class Character_Controller : NetworkBehaviour
         {
             heldItem.transform.position = transform.position + itemCarryOffset;
         }
-        if (stunned)
-        {
-            StartCoroutine("Stun");
-        }
-
-        
-
     }
     void OnFlipChanged(bool previousValue, bool newValue)
     {
@@ -133,35 +125,27 @@ public class Character_Controller : NetworkBehaviour
         if (_playerInputs.PlayerActions.Attack.triggered && heldItem == null)
         {
             Collider2D[] enemigos = Physics2D.OverlapCircleAll(attackPos.position, attackRadius, LayerMask.GetMask("Enemigos"));
+
             anim.SetBool("Hit", true);
             anim.SetBool("Idle", false);
 
             foreach (Collider2D enemigo in enemigos)
             {
-                Character_Controller player = enemigo.GetComponent<Character_Controller>();
-                HitEnemy(player.gameObject, stunned);
+                Character_Controller player = enemigo.GetComponentInParent<Character_Controller>();
+
+                if (player != null)
+                {
+                    HitEnemy(player.gameObject, stunned);
+                }
             }
             StartCoroutine("FinishAttack");
-
         }
     }
     IEnumerator FinishAttack()
     {
         yield return new WaitForSeconds(1f);
-        anim.SetBool("Hit", true);
-        anim.SetBool("Idle", false);
-    }
-
-    IEnumerator Stun()
-    {
-        attackCol.enabled = false;
-        anim.SetBool("Stun", true);
-        anim.SetBool("Idle", false);
-        yield return new WaitForSeconds(stunTime);
-        anim.SetBool("Stun",false);
+        anim.SetBool("Hit", false);
         anim.SetBool("Idle", true);
-        attackCol.enabled = true;
-        StopCoroutine("Stun");
     }
     void PickUpItem()
     {
@@ -206,18 +190,38 @@ public class Character_Controller : NetworkBehaviour
 
     private void HitEnemy(GameObject target, bool stunned)
     {
-        target.GetComponent<Character_Controller>().stunned = true;
-        target.GetComponent<Character_Controller>().anim.SetBool("Stun", true);
-        target.GetComponent<Character_Controller>().SetHitFalse();
+        Debug.Log("Hit enemy");
+        Character_Controller enemy_controller = target.GetComponent<Character_Controller>();
+
+        if (enemy_controller.heldItem != null)
+            Destroy(enemy_controller.heldItem);
+
+        enemy_controller.stunned = true;
+        enemy_controller.attackCol.enabled = false;
+        Debug.Log("Stun enemy");
+        enemy_controller.anim.SetBool("Stun", true);
+        enemy_controller.anim.SetBool("Idle", false);
+        
+        enemy_controller.StartCoroutine(enemy_controller.StunCoroutine());
+    }
+    private IEnumerator StunCoroutine()
+    {
+        float stunDuration = 1f;
+
+        yield return new WaitForSeconds(stunDuration);
+
+        StunFalse();
     }
 
+    public void StunFalse()
+    {
+        Debug.Log("Stun false");
+        anim.SetBool("Stun", false);
+        attackCol.enabled = true;
+        anim.SetBool("Idle", true);
+    }
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(attackPos.position, attackRadius);
-    }
-
-    public void SetHitFalse()
-    {
-        anim.SetBool("Hit",false);
     }
 }
