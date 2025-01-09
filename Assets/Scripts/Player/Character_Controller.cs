@@ -23,6 +23,12 @@ public class Character_Controller : NetworkBehaviour
     PlayerDataList playerData;
 
     [Header("Player Settings")]
+    private NetworkVariable<bool> netFlipX = new NetworkVariable<bool>(
+        default,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner // Solo el servidor puede escribir
+    );
+
     [SerializeField] private bool stunned;
     [SerializeField] private float stunTime;
     [SerializeField] private float attackRadius;
@@ -39,7 +45,6 @@ public class Character_Controller : NetworkBehaviour
     {
         _playerInputs = new PlayerInputs();
         _playerInputs.Enable();
-
         // Acción para coger el ítem
         _playerInputs.PlayerActions.PickItem.performed += ctx => PickUpItem();
         //Soltar el item
@@ -54,6 +59,7 @@ public class Character_Controller : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        netFlipX.OnValueChanged += OnFlipChanged;
         _Vcamera = transform.GetComponentInChildren<CinemachineVirtualCamera>();
         if (IsOwner && _Vcamera != null)
         {
@@ -88,26 +94,30 @@ public class Character_Controller : NetworkBehaviour
         
 
     }
-
+    void OnFlipChanged(bool previousValue, bool newValue)
+    {
+        sp.flipX = newValue;
+        // Actualizar la posición del punto de ataque
+        attackPos.localPosition = new Vector3(newValue ? -Mathf.Abs(attackPos.localPosition.x) : Mathf.Abs(attackPos.localPosition.x),
+            attackPos.localPosition.y,
+            attackPos.localPosition.z);
+    }
     void Move()
     {
+        if (!IsOwner) return;
+
         moveDir = _playerInputs.PlayerActions.Mover.ReadValue<Vector2>();
         rb.velocity = new Vector2(moveDir.x * moveSpeed, moveDir.y * moveSpeed);
+
         if (moveDir.x >= 0.1f || moveDir.y >= 0.1 || moveDir.x <= -0.1 || moveDir.y <= -0.1)
         {
             anim.SetBool("Move", true);
             anim.SetBool("Idle", false);
-            if (moveDir.x <= -0.1 || moveDir.y <= -0.1)
+
+            bool shouldFlip = (moveDir.x <= -0.1 || moveDir.y <= -0.1);
+            if (netFlipX.Value != shouldFlip)
             {
-                sp.flipX = true;
-                // Girar la posición del punto de ataque
-                attackPos.localPosition = new Vector3(-Mathf.Abs(attackPos.localPosition.x), attackPos.localPosition.y, attackPos.localPosition.z);
-            }
-            else
-            {
-                sp.flipX = false;
-                // Restaurar la posición original del punto de ataque
-                attackPos.localPosition = new Vector3(Mathf.Abs(attackPos.localPosition.x), attackPos.localPosition.y, attackPos.localPosition.z);
+                netFlipX.Value = shouldFlip;
             }
         }
         else
