@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
 public class Item_Product : MonoBehaviour
@@ -15,6 +16,13 @@ public class Item_Product : MonoBehaviour
 
     private ShoppingListManager shoppingListManager;
 
+    private void Awake()
+    {
+        if (!GetComponent<NetworkObject>())
+        {
+            Debug.LogError("Item_Product necesita un componente NetworkObject");
+        }
+    }
     void Start()
     {
         canvasNameItem = GetComponentInChildren<TextMeshProUGUI>();

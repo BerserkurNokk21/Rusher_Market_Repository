@@ -1,28 +1,27 @@
+using Unity.Netcode;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
-public class ItemSpawnManager : MonoBehaviour
+public class ItemSpawnManager : NetworkBehaviour
 {
     [System.Serializable]
     public class SpawnPointConfig
     {
-        public Transform spawnPoint; // Punto de spawn
-        public GameObject itemPrefab; // Ítem que aparecerá en este punto
+        public Transform spawnPoint;
+        public GameObject itemPrefab;
     }
 
-    [SerializeField] private List<SpawnPointConfig> spawnPointConfigs; // Configuración de puntos de spawn
-    public float spawnInterval = 5.0f; // Intervalo entre spawns
-    public float initialSpawnDelay = 2.0f; // Retraso inicial antes del primer spawn
-
+    [SerializeField] private List<SpawnPointConfig> spawnPointConfigs;
+    public float spawnInterval = 5.0f;
+    public float initialSpawnDelay = 2.0f;
     void Start()
     {
         StartCoroutine(SpawnItems());
     }
-
-    // Corrutina para instanciar los ítems en sus puntos asignados
     IEnumerator SpawnItems()
     {
+        Debug.Log("Iniciando spawn de items en servidor");
         yield return new WaitForSeconds(initialSpawnDelay);
 
         while (true)
@@ -31,15 +30,20 @@ public class ItemSpawnManager : MonoBehaviour
             {
                 if (config.itemPrefab != null && config.spawnPoint != null)
                 {
-                    // Instanciar el ítem asignado en el punto correspondiente
-                    Instantiate(config.itemPrefab, config.spawnPoint.position, config.spawnPoint.rotation);
-                }
-                else
-                {
-                    Debug.LogWarning("Un punto de spawn o un prefab no están asignados en la configuración.");
+                    Debug.Log($"Intentando spawnear item: {config.itemPrefab.name}");
+                    GameObject item = Instantiate(config.itemPrefab, config.spawnPoint.position, config.spawnPoint.rotation);
+                    NetworkObject networkObject = item.GetComponent<NetworkObject>();
+                    if (networkObject != null)
+                    {
+                        networkObject.Spawn();
+                        Debug.Log($"Item spawneado exitosamente: {item.name}");
+                    }
+                    else
+                    {
+                        Debug.LogError($"Error: El prefab {config.itemPrefab.name} no tiene NetworkObject");
+                    }
                 }
             }
-
             yield return new WaitForSeconds(spawnInterval);
         }
     }

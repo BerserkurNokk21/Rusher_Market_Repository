@@ -29,6 +29,17 @@ public class Character_Controller : NetworkBehaviour
         NetworkVariableWritePermission.Owner // Solo el servidor puede escribir
     );
 
+    private NetworkVariable<NetworkObjectReference> netHeldItem = new NetworkVariable<NetworkObjectReference>(
+        default,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+)   ;
+    [Header("Item Network Configuration")]
+    private Vector3 lastItemPosition;
+    private Vector3 targetItemPosition;
+    private float itemLerpTime = 0f;
+    private float itemLerpDuration = 0.1f; // Ajusta este valor según necesites
+
     [SerializeField] private bool stunned;
     [SerializeField] private float stunTime = 2f;
     [SerializeField] private float attackRadius;
@@ -36,9 +47,6 @@ public class Character_Controller : NetworkBehaviour
     public float moveSpeed;
     public Vector3 itemCarryOffset = new Vector3(0.5f, 0.5f, 0); // Offset del ítem respecto al jugador
     public Vector2 moveDir;
-
-
-
 
 
     void Start()
@@ -59,6 +67,7 @@ public class Character_Controller : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        netHeldItem.OnValueChanged += OnNetHeldItemChanged;
         netFlipX.OnValueChanged += OnFlipChanged;
         _Vcamera = transform.GetComponentInChildren<CinemachineVirtualCamera>();
         if (IsOwner && _Vcamera != null)
@@ -72,18 +81,36 @@ public class Character_Controller : NetworkBehaviour
         }
     }
 
+    void FixedUpdate()
+    {
+        if (!IsSpawned) return;
 
+        // Actualizar posición del ítem en FixedUpdate
+        if (netHeldItem.Value.TryGet(out NetworkObject networkObject))
+        {
+            Item_Product item = networkObject.GetComponent<Item_Product>();
+            if (item != null)
+            {
+                Vector3 newPosition = transform.position + itemCarryOffset;
+                // El dueño actualiza directamente
+                item.transform.position = newPosition;
+                UpdateItemPositionServerRpc(newPosition);
+            }
+        }
+    }
 
     void Update()
     {
-        if (!IsOwner){
-            return;
-        }
         Move();
         Hit();
-        if (heldItem != null)
+
+        if (netHeldItem.Value.TryGet(out NetworkObject networkObject))
         {
-            heldItem.transform.position = transform.position + itemCarryOffset;
+            Item_Product item = networkObject.GetComponent<Item_Product>();
+            if (item != null)
+            {
+                item.transform.position = transform.position + itemCarryOffset;
+            }
         }
     }
     void OnFlipChanged(bool previousValue, bool newValue)
@@ -96,8 +123,6 @@ public class Character_Controller : NetworkBehaviour
     }
     void Move()
     {
-        if (!IsOwner) return;
-
         moveDir = _playerInputs.PlayerActions.Mover.ReadValue<Vector2>();
         rb.velocity = new Vector2(moveDir.x * moveSpeed, moveDir.y * moveSpeed);
 
@@ -147,20 +172,73 @@ public class Character_Controller : NetworkBehaviour
         anim.SetBool("Hit", false);
         anim.SetBool("Idle", true);
     }
-    void PickUpItem()
+    public void PickUpItem()
     {
         if (isNearItem && nearbyItem != null && heldItem == null)
         {
-            heldItem = nearbyItem;
+            Debug.Log("Intentando recoger item");
+            NetworkObject networkObject = nearbyItem.GetComponent<NetworkObject>();
+            if (networkObject != null)
+            {
+                // El cliente llama al ServerRpc
+                PickUpItemServerRpc(new NetworkObjectReference(networkObject));
+                heldItem = nearbyItem;  // Actualización local
+            }
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]  // Añade RequireOwnership = false
+    private void PickUpItemServerRpc(NetworkObjectReference itemRef)
+    {
+        Debug.Log("Pick up item server rpc");
+        netHeldItem.Value = itemRef;
+
+        if (itemRef.TryGet(out NetworkObject networkObject))
+        {
+            networkObject.transform.SetParent(transform);
         }
     }
 
     void DropItem()
     {
-        if (heldItem!=null)
+        if (heldItem != null)
         {
-            Destroy(heldItem.gameObject);
+            DropItemServerRpc();
+            heldItem = null;
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]  // Añade RequireOwnership = false
+    private void DropItemServerRpc()
+    {
+        if (netHeldItem.Value.TryGet(out NetworkObject networkObject))
+        {
+            networkObject.Despawn(true);
+        }
+        netHeldItem.Value = default;
+    }
+    // Este método se ejecuta en todos los clientes cuando cambia la NetworkVariable
+    private void OnNetHeldItemChanged(NetworkObjectReference previousValue, NetworkObjectReference newValue)
+    {
+        Debug.Log("NetworkVariable changed");
+        if (newValue.TryGet(out NetworkObject networkObject))
+        {
+            // Actualizar visualización del item
+            networkObject.transform.position = transform.position + itemCarryOffset;
+        }
+    }
+
+    [ServerRpc]
+    private void UpdateItemPositionServerRpc(Vector3 newPosition)
+    {
+        UpdateItemPositionClientRpc(newPosition);
+    }
+    [ClientRpc]
+    private void UpdateItemPositionClientRpc(Vector3 newPosition)
+    {
+        lastItemPosition = targetItemPosition;
+        targetItemPosition = newPosition;
+        itemLerpTime = 0f;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -171,8 +249,6 @@ public class Character_Controller : NetworkBehaviour
             nearbyItem = item;
             isNearItem = true;
         }
-
-        
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
@@ -223,5 +299,11 @@ public class Character_Controller : NetworkBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(attackPos.position, attackRadius);
+    }
+
+    private void OnDestroy()
+    {
+        // Desuscribirse del evento
+        netHeldItem.OnValueChanged -= OnNetHeldItemChanged;
     }
 }
