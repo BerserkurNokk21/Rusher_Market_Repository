@@ -5,8 +5,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-
-
 public class Character_Controller : NetworkBehaviour
 {
     [Header("Player References")]
@@ -22,7 +20,7 @@ public class Character_Controller : NetworkBehaviour
     Enemy enemy;
     PlayerDataList playerData;
 
-    [Header("Player Settings")]
+    [Header("Player Network Configuration")]
     private NetworkVariable<bool> netFlipX = new NetworkVariable<bool>(
         default,
         NetworkVariableReadPermission.Everyone,
@@ -33,7 +31,17 @@ public class Character_Controller : NetworkBehaviour
         default,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server
-)   ;
+    );
+    private NetworkVariable<bool> netIsAttacking = new NetworkVariable<bool>(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner
+    );
+    private NetworkVariable<bool> netStunned = new NetworkVariable<bool>(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
     [Header("Item Network Configuration")]
     private Vector3 lastItemPosition;
     private Vector3 targetItemPosition;
@@ -69,6 +77,8 @@ public class Character_Controller : NetworkBehaviour
     {
         netHeldItem.OnValueChanged += OnNetHeldItemChanged;
         netFlipX.OnValueChanged += OnFlipChanged;
+        netIsAttacking.OnValueChanged += OnAttackStateChanged;
+        netStunned.OnValueChanged += OnStunnedStateChanged;
         _Vcamera = transform.GetComponentInChildren<CinemachineVirtualCamera>();
         if (IsOwner && _Vcamera != null)
         {
@@ -123,6 +133,12 @@ public class Character_Controller : NetworkBehaviour
     }
     void Move()
     {
+        if (netStunned.Value)
+        {
+            rb.velocity = Vector2.zero;
+            return;
+        }
+
         moveDir = _playerInputs.PlayerActions.Mover.ReadValue<Vector2>();
         rb.velocity = new Vector2(moveDir.x * moveSpeed, moveDir.y * moveSpeed);
 
@@ -144,15 +160,17 @@ public class Character_Controller : NetworkBehaviour
         }
     }
 
-
+    #region Attack Player Logic
     private void Hit()
     {
+        if (!IsOwner) return;
+
         if (_playerInputs.PlayerActions.Attack.triggered && heldItem == null)
         {
-            Collider2D[] enemigos = Physics2D.OverlapCircleAll(attackPos.position, attackRadius, LayerMask.GetMask("Enemigos"));
+            // Activar la animación solo localmente
+            netIsAttacking.Value = true;
 
-            anim.SetBool("Hit", true);
-            anim.SetBool("Idle", false);
+            Collider2D[] enemigos = Physics2D.OverlapCircleAll(attackPos.position, attackRadius, LayerMask.GetMask("Enemigos"));
 
             foreach (Collider2D enemigo in enemigos)
             {
@@ -160,18 +178,124 @@ public class Character_Controller : NetworkBehaviour
 
                 if (player != null)
                 {
-                    HitEnemy(player.gameObject, stunned);
+                    HitEnemyServerRpc(player.NetworkObjectId);
                 }
             }
-            StartCoroutine("FinishAttack");
         }
     }
-    IEnumerator FinishAttack()
+    private void OnAttackStateChanged(bool previousValue, bool newValue)
+    {
+        if (newValue)
+        {
+            // Iniciar la animación de ataque
+            anim.SetBool("Hit", true);
+            anim.SetBool("Idle", false);
+            StartCoroutine(FinishAttack());
+        }
+    }
+
+    [ServerRpc]
+    private void HitEnemyServerRpc(ulong targetNetworkId)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetNetworkId, out NetworkObject targetNetworkObject))
+        {
+            Character_Controller targetController = targetNetworkObject.GetComponent<Character_Controller>();
+            if (targetController != null)
+            {
+                targetController.netStunned.Value = true;
+
+                if (targetController.heldItem != null)
+                {
+                    targetController.DropItemServerRpc();
+                }
+
+                // Aplicar el stun inmediatamente en todos los clientes
+                ApplyStunEffectsClientRpc(targetNetworkId, true);
+            }
+        }
+    }
+
+    [ClientRpc]
+    private void ApplyStunEffectsClientRpc(ulong targetNetworkId, bool isStunned)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetNetworkId, out NetworkObject targetNetworkObject))
+        {
+            Character_Controller targetController = targetNetworkObject.GetComponent<Character_Controller>();
+            if (targetController != null)
+            {
+                // Aplicar efectos visuales directamente
+                targetController.SetStunState(isStunned);
+            }
+        }
+    }
+    private void SetStunState(bool isStunned)
+    {
+        if (isStunned)
+        {
+            stunned = true;
+            attackCol.enabled = false;
+            anim.SetBool("Stun", true);
+            anim.SetBool("Idle", false);
+            anim.SetBool("Move", false);
+        }
+        else
+        {
+            stunned = false;
+            attackCol.enabled = true;
+            anim.SetBool("Stun", false);
+            anim.SetBool("Idle", true);
+            anim.SetBool("Move", false);
+        }
+    }
+
+    private void OnStunnedStateChanged(bool previousValue, bool newValue)
+    {
+        // Aplicar efectos visuales inmediatamente cuando cambia el estado
+        SetStunState(newValue);
+
+        if (newValue)
+        {
+            StartCoroutine(StunCoroutine());
+        }
+    }
+
+    [ClientRpc]
+    private void StunFalseClientRpc()
+    {
+        StunFalse();
+    }
+
+    private IEnumerator FinishAttack()
     {
         yield return new WaitForSeconds(1f);
+
+        if (IsOwner)
+        {
+            netIsAttacking.Value = false;
+        }
+
         anim.SetBool("Hit", false);
         anim.SetBool("Idle", true);
     }
+    private IEnumerator StunCoroutine()
+    {
+        float stunDuration = 1f;
+        yield return new WaitForSeconds(stunDuration);
+
+        if (IsServer)
+        {
+            netStunned.Value = false;
+            // Asegurarnos de que todos los clientes actualicen su estado visual
+            ApplyStunEffectsClientRpc(NetworkObjectId, false);
+        }
+    }
+    public void StunFalse()
+    {
+        SetStunState(false);
+    }
+    #endregion
+
+    #region Item Player Logic
     public void PickUpItem()
     {
         if (isNearItem && nearbyItem != null && heldItem == null)
@@ -217,7 +341,6 @@ public class Character_Controller : NetworkBehaviour
         }
         netHeldItem.Value = default;
     }
-    // Este método se ejecuta en todos los clientes cuando cambia la NetworkVariable
     private void OnNetHeldItemChanged(NetworkObjectReference previousValue, NetworkObjectReference newValue)
     {
         Debug.Log("NetworkVariable changed");
@@ -240,7 +363,7 @@ public class Character_Controller : NetworkBehaviour
         targetItemPosition = newPosition;
         itemLerpTime = 0f;
     }
-
+    #endregion
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Item_Product item = collision.GetComponent<Item_Product>();
@@ -258,7 +381,7 @@ public class Character_Controller : NetworkBehaviour
             nearbyItem = null;
             isNearItem = false;
         }
-        if (collision.CompareTag("Enemy") )
+        if (collision.CompareTag("Enemy"))
         {
             enemy.stunned = false;
         }
@@ -277,25 +400,11 @@ public class Character_Controller : NetworkBehaviour
         Debug.Log("Stun enemy");
         enemy_controller.anim.SetBool("Stun", true);
         enemy_controller.anim.SetBool("Idle", false);
-        
+
         enemy_controller.StartCoroutine(enemy_controller.StunCoroutine());
     }
-    private IEnumerator StunCoroutine()
-    {
-        float stunDuration = 1f;
 
-        yield return new WaitForSeconds(stunDuration);
 
-        StunFalse();
-    }
-
-    public void StunFalse()
-    {
-        Debug.Log("Stun false");
-        anim.SetBool("Stun", false);
-        attackCol.enabled = true;
-        anim.SetBool("Idle", true);
-    }
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(attackPos.position, attackRadius);
@@ -305,5 +414,8 @@ public class Character_Controller : NetworkBehaviour
     {
         // Desuscribirse del evento
         netHeldItem.OnValueChanged -= OnNetHeldItemChanged;
+        netHeldItem.OnValueChanged -= OnNetHeldItemChanged;
+        netIsAttacking.OnValueChanged -= OnAttackStateChanged;
+        netStunned.OnValueChanged -= OnStunnedStateChanged;
     }
 }
