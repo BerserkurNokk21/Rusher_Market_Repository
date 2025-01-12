@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: id
       value: eaa6cadf-7a87-4b2e-9542-e2086d43393c
       objectReference: {fileID: 0}
+    - target: {fileID: -4904692888945707518, guid: c73c9f964f3673f418adcdab870c8cce, type: 3}
+      propertyPath: points
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 21385875418073397, guid: c73c9f964f3673f418adcdab870c8cce, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 3182328090
