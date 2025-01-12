@@ -440,8 +440,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 359737061
-  m_SortingLayer: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 2022739240, guid: 76dae5b616c5d4545ab4fd500bfeb1fc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -538,7 +538,7 @@ BoxCollider2D:
   m_GameObject: {fileID: 3261863673461498925}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: f9a59cee75430eb4c84281ba722d26ef, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -860,10 +860,12 @@ MonoBehaviour:
         byte0123: 0
         byte0124: 0
         byte0125: 0
-  id: 
-  playerName: 
+  playerPointsnetwork:
+    m_InternalValue: 0
   playerUsername: {fileID: 4107899969002709304}
   playerPoints: 0
+  id: 
+  playerName: 
 --- !u!114 &6710167786316827138
 MonoBehaviour:
   m_ObjectHideFlags: 0

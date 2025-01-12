@@ -10,6 +10,8 @@ public class LobbysList : MonoBehaviour
 	[SerializeField] private LobbyItem lobbyItemPrefab;
     private bool _isRefreshing = false;
     private bool _isJoining;
+	public GameObject m_LoadingScreen;
+	public UiLoadAnimation m_UiLoadAnimation;
 
     private void OnEnable()
     {
@@ -71,6 +73,8 @@ public class LobbysList : MonoBehaviour
 		{
 			Lobby joiningLobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobby.Id);
 			string joinCode = joiningLobby.Data["JoinCode"].Value;
+			m_LoadingScreen.SetActive(true);
+			m_UiLoadAnimation.Func_PlayUIAnim();
 
 			await ClientSingleton.Instance.GameManager.StartClientAsync(joinCode);
 		}
