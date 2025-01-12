@@ -1690,7 +1690,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3191582198123067611, guid: 72e8047b4fe27dd40a7584d844fe781b, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -1536.7494
+      value: -1536.7499
       objectReference: {fileID: 0}
     - target: {fileID: 7922008507451488731, guid: 72e8047b4fe27dd40a7584d844fe781b, type: 3}
       propertyPath: m_AnchorMax.x
@@ -2775,18 +2775,6 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1679925196}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
         m_CallState: 2
       - m_Target: {fileID: 1878165477}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
