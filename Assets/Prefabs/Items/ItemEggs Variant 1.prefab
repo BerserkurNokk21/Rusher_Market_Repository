@@ -25,6 +25,18 @@ PrefabInstance:
       value: ItemEggs Variant 1
       objectReference: {fileID: 0}
     - target: {fileID: 3260981262690550984, guid: c73c9f964f3673f418adcdab870c8cce, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3260981262690550984, guid: c73c9f964f3673f418adcdab870c8cce, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3260981262690550984, guid: c73c9f964f3673f418adcdab870c8cce, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3260981262690550984, guid: c73c9f964f3673f418adcdab870c8cce, type: 3}
       propertyPath: m_LocalPosition.x
       value: -6.001572
       objectReference: {fileID: 0}
