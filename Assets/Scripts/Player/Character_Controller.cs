@@ -323,7 +323,7 @@ public class Character_Controller : NetworkBehaviour
         }
     }
 
-    void DropItem()
+    public void DropItem()
     {
         if (heldItem != null)
         {

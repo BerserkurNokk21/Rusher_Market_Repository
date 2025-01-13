@@ -2,14 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
-public class ShoppingBasket : MonoBehaviour
+public class ShoppingBasket : NetworkBehaviour
 {
     [SerializeField] private Character_Controller player;
     public Item_List item_List;
     public TextMeshProUGUI itemText;
-
 
     private void Start()
     {
@@ -28,19 +28,16 @@ public class ShoppingBasket : MonoBehaviour
     private void CheckItemList()
     {
         Item_Product heldItem = player.heldItem.GetComponent<Item_Product>();
-        if (heldItem != null)
+        if (heldItem != null && heldItem.selectedProduct != null)
         {
-            Debug.Log(heldItem.selectedProduct);
-            if (heldItem.selectedProduct != null)
+            foreach (Product product in item_List.playerShoppingList)
             {
-                foreach (Product product in item_List.playerShoppingList)
+                if (product.id == heldItem.id)
                 {
-                    if (product.id == heldItem.id)
-                    {
-                        itemText.text = "Product found in the shopping list";
-                        StartCoroutine(ClearItemText());
-                        DropItemInBasket();
-                    }
+                    itemText.text = "Product found in the shopping list";
+                    StartCoroutine(ClearItemText());
+                    DropItemInBasket();
+                    break;
                 }
             }
         }
@@ -52,7 +49,7 @@ public class ShoppingBasket : MonoBehaviour
         itemText.text = "";
     }
 
-    public void DropItemInBasket()
+    private void DropItemInBasket()
     {
         if (player.heldItem != null)
         {
@@ -60,11 +57,10 @@ public class ShoppingBasket : MonoBehaviour
             if (itemProduct != null)
             {
                 AddPoints(itemProduct.points);
-                // Destruir el objeto en la escena
-                Destroy(player.heldItem.gameObject);
-
-                // Limpiar el ítem que el jugador sostiene
-                player.heldItem = null;
+                
+                // En lugar de usar Destroy, llamamos al método del jugador para soltar el ítem
+                // que ya tiene la lógica de red implementada
+                player.DropItem();
             }
         }
     }
