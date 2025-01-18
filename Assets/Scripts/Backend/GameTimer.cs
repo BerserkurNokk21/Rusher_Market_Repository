@@ -155,11 +155,13 @@ public class GameTimer : NetworkBehaviour
         string uri = "http://localhost/unity_api/update_game_champion.php";
         WWWForm form = new WWWForm();
 
-        form.AddField("game_id", LobbyData.lobbyDB_ID);
-        //form.AddField("time_played", initialTimeLeft);
-        form.AddField("player_champion", idChampion);
-
-        StartCoroutine(SendChampionData(uri, form));
+        var lobbyData = GetComponent<LobbyData>();
+        if (lobbyData != null)
+        {
+            form.AddField("game_id", lobbyData.GetLobbyDB_ID());
+            form.AddField("player_champion", idChampion);
+            StartCoroutine(SendChampionData(uri, form));
+        }
     }
 
     private IEnumerator SendChampionData(string uri, WWWForm form)

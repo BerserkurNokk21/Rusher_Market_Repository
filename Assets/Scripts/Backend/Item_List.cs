@@ -12,6 +12,7 @@ public class Item_List : NetworkBehaviour
     public List<Product> playerShoppingList = new List<Product>();
     public string playerId;
     public string gameID;
+    public LobbyData _lobbyData;
     [SerializeField] private int listProductsLimit = 5;
     private bool productsLoaded = false;
 
@@ -103,7 +104,7 @@ public class Item_List : NetworkBehaviour
     {
         string uri = "http://localhost/unity_api/register_shopping_list.php";
         WWWForm form = new WWWForm();
-        gameID = LobbyData.lobbyDB_ID;
+        gameID = _lobbyData.networkLobbyDB_ID.Value.ToString();
         form.AddField("player_id", playerId);
         form.AddField("game_id", gameID);
 
@@ -143,6 +144,7 @@ public class Item_List : NetworkBehaviour
                 Debug.LogError("Error al parsear la respuesta JSON: " + e.Message);
             }
         }
+
     }
 
 

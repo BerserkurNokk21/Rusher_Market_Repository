@@ -150,7 +150,9 @@ public class HostGameManager
 
                     if (response != null && response.status == "success")
                     {
-                        LobbyData.SetLobbyData(lobbyId, response.data?.game_id);
+                        //LobbyData.SetLobbyData(lobbyId, response.data?.game_id);
+                        LobbyData.lobby_joinCode = lobbyId;
+                        LobbyData.lobbyId = response.data?.game_id;
                         Debug.Log($"Partida registrada exitosamente");
                         Debug.Log($"ID de partida: {response.data?.game_id}");
                         Debug.Log($"Mensaje: {response.message}");
